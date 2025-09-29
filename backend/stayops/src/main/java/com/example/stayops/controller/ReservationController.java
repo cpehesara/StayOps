@@ -1,0 +1,74 @@
+package com.example.stayops.controller;
+
+import com.example.stayops.dto.*;
+import com.example.stayops.service.ReservationService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.time.LocalDate;
+import java.util.List;
+import java.util.Map;
+
+@RestController
+@RequestMapping("/api/reservations")
+@RequiredArgsConstructor
+@CrossOrigin(origins = "*")
+public class ReservationController {
+
+    private final ReservationService reservationService;
+
+    @PostMapping("/create")
+    public ResponseEntity<ReservationResponseDTO> createReservation(@RequestBody ReservationRequestDTO dto) {
+        return ResponseEntity.ok(reservationService.createReservation(dto));
+    }
+
+    @PutMapping("/update/{reservationId}")
+    public ResponseEntity<ReservationResponseDTO> updateReservation(
+            @PathVariable Long reservationId,
+            @RequestBody ReservationRequestDTO dto) {
+        return ResponseEntity.ok(reservationService.updateReservation(reservationId, dto));
+    }
+
+    @DeleteMapping("/delete/{reservationId}")
+    public ResponseEntity<Void> deleteReservation(@PathVariable Long reservationId) {
+        reservationService.deleteReservation(reservationId);
+        return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/get/{reservationId}")
+    public ResponseEntity<ReservationResponseDTO> getReservationById(@PathVariable Long reservationId) {
+        return ResponseEntity.ok(reservationService.getReservationById(reservationId));
+    }
+
+    @GetMapping("/getAll")
+    public ResponseEntity<List<ReservationResponseDTO>> getAllReservations() {
+        return ResponseEntity.ok(reservationService.getAllReservations());
+    }
+
+    @GetMapping("/reservations")
+    public List<Map<String, Object>> getAllRoomReservations() {
+        return reservationService.getAllRoomReservationStatuses();
+    }
+
+    @GetMapping("/calendar")
+    public ResponseEntity<List<ReservationSummaryDTO>> getReservationCalendar(
+            @RequestParam int year,
+            @RequestParam int month) {
+        return ResponseEntity.ok(reservationService.getMonthlySummary(year, month));
+    }
+
+    @GetMapping("/day")
+    public ResponseEntity<List<ReservationDayDetailDTO>> getReservationsByDate(
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
+        return ResponseEntity.ok(reservationService.getReservationsForDate(date));
+    }
+
+    @GetMapping("/date-range")
+    public ResponseEntity<List<ReservationResponseDTO>> getReservationsInDateRange(
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
+        return ResponseEntity.ok(reservationService.getReservationsInDateRange(startDate, endDate));
+    }
+}
