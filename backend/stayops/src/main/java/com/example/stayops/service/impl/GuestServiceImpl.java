@@ -27,7 +27,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-@Slf4j  // This adds the log field
+@Slf4j
 public class GuestServiceImpl implements GuestService {
 
     private final GuestRepository guestRepository;
@@ -44,22 +44,23 @@ public class GuestServiceImpl implements GuestService {
         try {
             log.info("Creating guest with email: {}", dto.getEmail());
 
-            // Check if guest already exists
             if (guestRepository.findByEmail(dto.getEmail()).isPresent()) {
                 log.warn("Guest already exists with email: {}", dto.getEmail());
                 throw new RuntimeException("Guest already exists with this email");
             }
 
-            // Generate unique guest ID
             String guestId = generateUniqueGuestId();
+            log.debug("Generated unique guest ID: {}", guestId);
 
-            // Handle image upload if provided
             String imageUrl = null;
             if (identityImage != null && !identityImage.isEmpty()) {
                 imageUrl = uploadImageToCloudinary(identityImage);
             }
 
-            // Create guest entity
+            // Generate QR code FIRST with just the guest ID
+            byte[] qrCodeBytes = generateQRCode(guestId);
+            log.debug("QR code generated, size: {} bytes", qrCodeBytes != null ? qrCodeBytes.length : 0);
+
             Guest guest = Guest.builder()
                     .guestId(guestId)
                     .firstName(dto.getFirstName())
@@ -70,27 +71,24 @@ public class GuestServiceImpl implements GuestService {
                     .identityType(dto.getIdentityType())
                     .identityNumber(dto.getIdentityNumber())
                     .imageUrl(imageUrl)
+                    .qrCodeImage(qrCodeBytes)
                     .build();
 
-            // Generate QR Code
-            byte[] qrCodeBytes = generateQRCode(guestId);
-            guest.setQrCodeImage(qrCodeBytes);
-
-            // Save guest
             Guest savedGuest = guestRepository.save(guest);
-            log.info("Guest created successfully with ID: {}", savedGuest.getGuestId());
+            guestRepository.flush(); // Ensure data is written to database
+            log.info("Guest created successfully with ID: {}, QR code size: {} bytes",
+                    savedGuest.getGuestId(),
+                    savedGuest.getQrCodeImage() != null ? savedGuest.getQrCodeImage().length : 0);
 
-            // Send welcome email with registration link
+            // Send welcome email asynchronously in a separate transaction
             try {
                 emailService.sendWelcomeEmailWithRegistrationLink(savedGuest);
-                log.info("Welcome email sent to guest: {}", savedGuest.getEmail());
+                log.info("Welcome email initiated for guest: {}", savedGuest.getEmail());
             } catch (Exception e) {
-                log.error("Failed to send welcome email to guest: {} - Error: {}",
-                        savedGuest.getEmail(), e.getMessage(), e);
-                // Don't fail the guest creation if email fails - just log it
+                log.error("Failed to initiate welcome email for guest: {} - Error: {}",
+                        savedGuest.getEmail(), e.getMessage());
             }
 
-            // Convert to response DTO
             return convertToResponseDTO(savedGuest);
 
         } catch (Exception e) {
@@ -124,42 +122,36 @@ public class GuestServiceImpl implements GuestService {
         try {
             log.info("Starting web registration for email: {}", dto.getEmail());
 
-            // Validate token
             EmailConfirmationToken confirmationToken = emailService.validateToken(token);
 
-            // Ensure email matches token
             if (!confirmationToken.getEmail().equals(dto.getEmail())) {
                 log.warn("Email mismatch in token validation. Token email: {}, DTO email: {}",
                         confirmationToken.getEmail(), dto.getEmail());
                 throw new RuntimeException("Email mismatch");
             }
 
-            // Check if guest exists
             Guest guest = guestRepository.findByEmail(dto.getEmail())
                     .orElseThrow(() -> {
                         log.error("Guest not found for email: {}", dto.getEmail());
                         return new RuntimeException("Guest not found with email: " + dto.getEmail());
                     });
 
-            // Check if account already exists
             Optional<GuestAccount> existingAccount = guestAccountRepository.findByEmail(dto.getEmail());
             if (existingAccount.isPresent()) {
                 log.warn("Account already exists for email: {}", dto.getEmail());
                 throw new RuntimeException("Account already exists for this email");
             }
 
-            // Create new guest account
             GuestAccount guestAccount = GuestAccount.builder()
                     .guest(guest)
                     .email(dto.getEmail())
                     .password(passwordEncoder.encode(dto.getPassword()))
-                    .activated(true) // Auto-activate since they came from email confirmation
+                    .activated(true)
                     .build();
 
             GuestAccount savedAccount = guestAccountRepository.save(guestAccount);
             log.info("Guest account created successfully for email: {}", dto.getEmail());
 
-            // Mark token as used
             emailService.markTokenAsUsed(token);
 
             return savedAccount;
@@ -177,7 +169,6 @@ public class GuestServiceImpl implements GuestService {
         try {
             log.info("Starting mobile registration for email: {}", dto.getEmail());
 
-            // Check if guest exists
             Optional<Guest> guestOptional = guestRepository.findByEmail(dto.getEmail());
             if (!guestOptional.isPresent()) {
                 log.error("Guest not found for mobile registration with email: {}", dto.getEmail());
@@ -186,25 +177,17 @@ public class GuestServiceImpl implements GuestService {
 
             Guest guest = guestOptional.get();
 
-            // Check if account already exists
             Optional<GuestAccount> existingAccount = guestAccountRepository.findByEmail(dto.getEmail());
             if (existingAccount.isPresent()) {
                 log.warn("Account already exists for mobile registration with email: {}", dto.getEmail());
                 throw new RuntimeException("Account already exists for this email");
             }
 
-            // For mobile registration, we might want to require email confirmation first
-            if (!emailService.hasValidTokenForEmail(dto.getEmail())) {
-                log.warn("No valid email confirmation token found for mobile registration: {}", dto.getEmail());
-                throw new RuntimeException("Please confirm your email first before registering");
-            }
-
-            // Create new guest account
             GuestAccount guestAccount = GuestAccount.builder()
                     .guest(guest)
                     .email(dto.getEmail())
                     .password(passwordEncoder.encode(dto.getPassword()))
-                    .activated(false) // Require activation for mobile registrations
+                    .activated(false)
                     .build();
 
             GuestAccount savedAccount = guestAccountRepository.save(guestAccount);
@@ -243,31 +226,22 @@ public class GuestServiceImpl implements GuestService {
                 .orElseThrow(() -> new RuntimeException("Guest not found"));
 
         if (guest.getQrCodeImage() == null || guest.getQrCodeImage().length == 0) {
+            log.warn("No QR code found for guest: {}", guestId);
             return null;
         }
 
-        // Use ImageConverterUtil to produce a data URL (includes mime detection)
         return ImageConverterUtil.bytesToBase64DataUrl(guest.getQrCodeImage());
     }
 
-    // Private helper methods
-
-    /**
-     * Generates a unique guest ID
-     */
     private String generateUniqueGuestId() {
         String guestId;
         do {
-            // Generate a random guest ID (you can customize this format)
             guestId = "GUEST" + String.format("%06d", new Random().nextInt(999999));
         } while (guestRepository.findById(guestId).isPresent());
 
         return guestId;
     }
 
-    /**
-     * Uploads image to Cloudinary and returns the URL
-     */
     private String uploadImageToCloudinary(MultipartFile file) {
         try {
             log.debug("Uploading image to Cloudinary: {}", file.getOriginalFilename());
@@ -291,19 +265,15 @@ public class GuestServiceImpl implements GuestService {
         }
     }
 
-    /**
-     * Generates QR code for the given guest ID
-     */
     private byte[] generateQRCode(String guestId) {
         try {
             log.debug("Generating QR code for guest: {}", guestId);
 
-            // You can customize the QR code content format
-            String qrContent = "GUEST:" + guestId;
+            // Use only the guest ID without any prefix for maximum compatibility
+            String qrContent = guestId;
+            byte[] qrCodeBytes = QRCodeUtil.generateQRCodeImage(qrContent, 300, 300);
 
-            byte[] qrCodeBytes = QRCodeUtil.generateQRCodeImage(qrContent, 200, 200);
-
-            log.debug("QR code generated successfully for guest: {}", guestId);
+            log.debug("QR code generated successfully for guest: {}, size: {} bytes", guestId, qrCodeBytes.length);
             return qrCodeBytes;
 
         } catch (Exception e) {
@@ -312,9 +282,6 @@ public class GuestServiceImpl implements GuestService {
         }
     }
 
-    /**
-     * Converts Guest entity to GuestResponseDTO
-     */
     private GuestResponseDTO convertToResponseDTO(Guest guest) {
         String qrCodeBase64 = null;
         if (guest.getQrCodeImage() != null) {
@@ -334,23 +301,17 @@ public class GuestServiceImpl implements GuestService {
                 .build();
     }
 
-    /**
-     * Alternative method for converting Guest to GuestResponseDTO with data URL
-     */
     private GuestResponseDTO toResponseDTO(Guest guest) {
-        // Keep the original raw base64 string
         String rawBase64 = null;
         if (guest.getQrCodeImage() != null && guest.getQrCodeImage().length > 0) {
             rawBase64 = Base64.getEncoder().encodeToString(guest.getQrCodeImage());
         }
 
-        // Prefer a data URL so frontend can use <img src="data:..."> directly
         String dataUrl = null;
         if (guest.getQrCodeImage() != null && guest.getQrCodeImage().length > 0) {
             try {
                 dataUrl = ImageConverterUtil.bytesToBase64DataUrl(guest.getQrCodeImage());
             } catch (Exception e) {
-                // fallback to plain base64 if anything goes wrong
                 dataUrl = (rawBase64 != null) ? ("data:image/png;base64," + rawBase64) : null;
             }
         }
@@ -364,7 +325,7 @@ public class GuestServiceImpl implements GuestService {
                 .identityType(guest.getIdentityType())
                 .identityNumber(guest.getIdentityNumber())
                 .imageUrl(guest.getImageUrl())
-                .qrCodeBase64(dataUrl)   // data URL (frontend friendly)
+                .qrCodeBase64(dataUrl)
                 .build();
     }
 }

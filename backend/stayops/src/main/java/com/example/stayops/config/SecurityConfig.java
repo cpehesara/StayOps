@@ -27,6 +27,7 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import java.util.Arrays;
 import java.util.List;
 
 @Configuration
@@ -73,10 +74,6 @@ public class SecurityConfig {
         return authProvider;
     }
 
-    /**
-     * Register both providers into an AuthenticationManager (ProviderManager).
-     * This is intentionally explicit to avoid surprises when multiple providers exist.
-     */
     @Bean
     public AuthenticationManager authenticationManager(DaoAuthenticationProvider guestAuthenticationProvider,
                                                        DaoAuthenticationProvider adminAuthenticationProvider) {
@@ -85,21 +82,19 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http.cors(cors -> cors.configurationSource(corsConfigurationSource()))
+        http
+                // CORS must be configured FIRST
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        // Allow preflight requests
+                        // Allow ALL OPTIONS requests (preflight) without authentication
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
 
                         // Public endpoints
                         .requestMatchers("/api/v1/auth/**").permitAll()
                         .requestMatchers("/api/v1/guests/create", "/api/v1/guests/register", "/api/v1/guests/getAll").permitAll()
-
-                        // Make all room endpoints public (allows POST /api/rooms/create without auth)
                         .requestMatchers("/api/rooms/**", "/api/rooms").permitAll()
-
-                        // Other public endpoints
                         .requestMatchers("/api/receptionists/register").permitAll()
                         .requestMatchers("/api/hotels/**").permitAll()
                         .requestMatchers("/api/reservation-details/**").permitAll()
@@ -110,7 +105,8 @@ public class SecurityConfig {
                         .requestMatchers("/api/staff/**").permitAll()
                         .requestMatchers("/api/v1/guests/**").permitAll()
                         .requestMatchers("/api/debug/**").permitAll()
-                        .requestMatchers("api/room-status-history/**").permitAll()
+                        .requestMatchers("/api/room-status-history/**").permitAll()
+                        .requestMatchers("/api/v1/reservation-history/**").permitAll()
 
                         // Admin endpoints
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
@@ -119,10 +115,10 @@ public class SecurityConfig {
                         .anyRequest().permitAll()
                 );
 
-        // Add JWT filter before UsernamePasswordAuthenticationFilter
+        // Add JWT filter AFTER OPTIONS requests are permitted
         http.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
 
-        // HTTP Basic only for admin endpoints (realm name set)
+        // HTTP Basic for admin endpoints
         http.httpBasic(httpBasic -> httpBasic.realmName("Admin"));
 
         return http.build();
@@ -131,10 +127,10 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-        // Allow all origins for testing/development. In production restrict to your frontends.
         config.setAllowedOriginPatterns(List.of("*"));
-        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS", "HEAD"));
         config.setAllowedHeaders(List.of("*"));
+        config.setExposedHeaders(List.of("*"));
         config.setAllowCredentials(false);
         config.setMaxAge(3600L);
 

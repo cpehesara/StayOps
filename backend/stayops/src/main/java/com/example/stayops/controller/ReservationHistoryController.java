@@ -11,6 +11,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/v1/reservation-history")
 @RequiredArgsConstructor
+@CrossOrigin(origins = {"*"})
 public class ReservationHistoryController {
 
     private final ReservationHistoryService reservationHistoryService;

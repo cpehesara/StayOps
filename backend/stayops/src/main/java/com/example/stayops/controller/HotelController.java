@@ -4,7 +4,6 @@ import com.example.stayops.entity.Hotel;
 import com.example.stayops.service.HotelService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -12,6 +11,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/hotels")
 @RequiredArgsConstructor
+@CrossOrigin(origins = "*")
 public class HotelController {
 
     private final HotelService hotelService;
@@ -21,7 +21,7 @@ public class HotelController {
         return ResponseEntity.ok(hotelService.createHotel(hotel));
     }
 
-    @PutMapping("update/{hotelId}")
+    @PutMapping("/update/{hotelId}")
     public ResponseEntity<Hotel> updateHotel(@PathVariable Long hotelId, @RequestBody Hotel hotel){
         return ResponseEntity.ok(hotelService.updateHotel(hotelId,hotel));
     }
@@ -32,7 +32,7 @@ public class HotelController {
         return ResponseEntity.noContent().build();
     }
 
-    @GetMapping("get/{hotelId}")
+    @GetMapping("/get/{hotelId}")
     public ResponseEntity<Hotel> getHotelById(@PathVariable Long hotelId){
         return  ResponseEntity.ok(hotelService.getHotelById(hotelId));
     }

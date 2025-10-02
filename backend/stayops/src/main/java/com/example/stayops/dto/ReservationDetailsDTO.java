@@ -11,14 +11,12 @@ import lombok.NoArgsConstructor;
 @Builder
 public class ReservationDetailsDTO {
 
-    private Long reservationId;
-    private String guestId;
-    private Long roomId;
+    private Long id;  // Auto-generated ID
+    private Long reservationId;  // Foreign key to reservation
     private Integer adults;
     private Integer kids;
-    private String roomType;
     private String mealPlan;
-    private String specialRequests;
     private String amenities;
+    private String specialRequests;
     private String additionalNotes;
 }

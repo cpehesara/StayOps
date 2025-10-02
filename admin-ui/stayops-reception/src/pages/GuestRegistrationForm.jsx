@@ -17,7 +17,6 @@ const GuestRegistration = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  // Handle text inputs
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
@@ -25,20 +24,17 @@ const GuestRegistration = () => {
       [name]: value,
     }));
     
-    // Clear error when user starts typing
     if (error) {
       setError(null);
     }
   };
 
-  // Handle file input
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     
-    // Validate file size (5MB limit)
     if (file && file.size > 5 * 1024 * 1024) {
       setError("Image file size must be less than 5MB");
-      e.target.value = ""; // Clear the file input
+      e.target.value = "";
       return;
     }
     
@@ -52,22 +48,17 @@ const GuestRegistration = () => {
     }
   };
 
-  // Validate email format
   const isValidEmail = (email) => {
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
   };
 
-  // Validate phone number (basic validation)
   const isValidPhone = (phone) => {
     return /^[+]?[\d\s\-()]{7,15}$/.test(phone);
   };
 
-  // Submit form
   const handleSubmit = async () => {
-    // Reset previous states
     setError(null);
     
-    // Validation
     const missingFields = [];
     if (!formData.firstName.trim()) missingFields.push("First Name");
     if (!formData.lastName.trim()) missingFields.push("Last Name");
@@ -81,13 +72,11 @@ const GuestRegistration = () => {
       return;
     }
 
-    // Email validation
     if (!isValidEmail(formData.email)) {
       setError("Please enter a valid email address");
       return;
     }
 
-    // Phone validation
     if (!isValidPhone(formData.phone)) {
       setError("Please enter a valid phone number");
       return;
@@ -106,17 +95,13 @@ const GuestRegistration = () => {
         identityNumber: formData.identityNumber.trim(),
       };
 
-      console.log("Submitting guest data:", guestData);
-
       const result = await receptionAPI.registerGuest(
         guestData,
         formData.identityImage
       );
 
-      console.log("Registration successful:", result);
       setResponse(result);
       
-      // Reset form on success
       setFormData({
         firstName: "",
         lastName: "",
@@ -139,7 +124,6 @@ const GuestRegistration = () => {
     }
   };
 
-  // Reset form
   const resetForm = () => {
     setFormData({
       firstName: "",
@@ -158,326 +142,200 @@ const GuestRegistration = () => {
     if (fileInput) fileInput.value = "";
   };
 
-  const inputStyle = {
-    width: "100%",
-    padding: "12px 16px",
-    border: "1px solid #e0e0e0",
-    borderRadius: "4px",
-    fontSize: "14px",
-    color: "#000",
-    backgroundColor: "#fff",
-    outline: "none",
-    transition: "border-color 0.2s ease",
-    boxSizing: "border-box"
-  };
-
-  const labelStyle = {
-    display: "block",
-    marginBottom: "6px",
-    fontSize: "14px",
-    fontWeight: "500",
-    color: "#000",
-  };
-
-  const buttonStyle = {
-    padding: "12px 24px",
-    border: "1px solid #000",
-    backgroundColor: "#fff",
-    color: "#000",
-    fontSize: "14px",
-    fontWeight: "500",
-    cursor: "pointer",
-    borderRadius: "4px",
-    transition: "all 0.2s ease",
-    outline: "none",
-  };
-
-  const primaryButtonStyle = {
-    ...buttonStyle,
-    backgroundColor: "#000",
-    color: "#fff",
-  };
-
-  const containerStyle = {
-    maxWidth: "500px",
-    margin: "0 auto",
-    padding: "40px 20px",
-    fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
-  };
-
   return (
-    <div style={containerStyle}>
-      <div style={{ textAlign: "center", marginBottom: "40px" }}>
-        <h1 style={{ 
-          fontSize: "28px", 
-          fontWeight: "600", 
-          color: "#000", 
-          margin: "0 0 8px 0" 
-        }}>
-          Guest Registration
-        </h1>
-        <p style={{ 
-          fontSize: "14px", 
-          color: "#666", 
-          margin: "0 0 16px 0" 
-        }}>
-          Please fill in all required information
-        </p>
-      </div>
-
-      <div style={{ backgroundColor: "#fff", padding: "32px", border: "1px solid #f0f0f0", borderRadius: "8px" }}>
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "20px", marginBottom: "20px" }}>
-          <div>
-            <label style={labelStyle}>
-              First Name <span style={{ color: "#e74c3c" }}>*</span>
-            </label>
-            <input
-              type="text"
-              name="firstName"
-              value={formData.firstName}
-              onChange={handleInputChange}
-              style={{
-                ...inputStyle,
-                borderColor: formData.firstName ? "#e0e0e0" : error && !formData.firstName ? "#e74c3c" : "#e0e0e0"
-              }}
-              placeholder="Enter first name"
-              disabled={loading}
-            />
-          </div>
-
-          <div>
-            <label style={labelStyle}>
-              Last Name <span style={{ color: "#e74c3c" }}>*</span>
-            </label>
-            <input
-              type="text"
-              name="lastName"
-              value={formData.lastName}
-              onChange={handleInputChange}
-              style={{
-                ...inputStyle,
-                borderColor: formData.lastName ? "#e0e0e0" : error && !formData.lastName ? "#e74c3c" : "#e0e0e0"
-              }}
-              placeholder="Enter last name"
-              disabled={loading}
-            />
-          </div>
+    <div className="min-h-screen bg-white">
+      <div className="max-w-2xl mx-auto px-8 py-12">
+        {/* Header */}
+        <div className="mb-16">
+          <h1 className="text-5xl font-light tracking-tight text-black mb-3">
+            Guest Registration
+          </h1>
+          <p className="text-gray-500 text-sm">
+            Please fill in all required information
+          </p>
         </div>
 
-        <div style={{ marginBottom: "20px" }}>
-          <label style={labelStyle}>
-            Email Address <span style={{ color: "#e74c3c" }}>*</span>
-          </label>
-          <input
-            type="email"
-            name="email"
-            value={formData.email}
-            onChange={handleInputChange}
-            style={{
-              ...inputStyle,
-              borderColor: formData.email ? "#e0e0e0" : error && !formData.email ? "#e74c3c" : "#e0e0e0"
-            }}
-            placeholder="Enter email address"
-            disabled={loading}
-          />
-        </div>
+        {/* Form */}
+        <div className="border border-gray-200 p-8">
+          {/* Name Fields */}
+          <div className="grid grid-cols-2 gap-6 mb-6">
+            <div>
+              <label className="block text-xs text-gray-500 mb-2">
+                First Name *
+              </label>
+              <input
+                type="text"
+                name="firstName"
+                value={formData.firstName}
+                onChange={handleInputChange}
+                className="w-full px-4 py-3 border border-gray-200 text-sm focus:outline-none focus:border-black transition-colors"
+                placeholder="Enter first name"
+                disabled={loading}
+              />
+            </div>
 
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "20px", marginBottom: "20px" }}>
-          <div>
-            <label style={labelStyle}>
-              Phone Number <span style={{ color: "#e74c3c" }}>*</span>
+            <div>
+              <label className="block text-xs text-gray-500 mb-2">
+                Last Name *
+              </label>
+              <input
+                type="text"
+                name="lastName"
+                value={formData.lastName}
+                onChange={handleInputChange}
+                className="w-full px-4 py-3 border border-gray-200 text-sm focus:outline-none focus:border-black transition-colors"
+                placeholder="Enter last name"
+                disabled={loading}
+              />
+            </div>
+          </div>
+
+          {/* Email */}
+          <div className="mb-6">
+            <label className="block text-xs text-gray-500 mb-2">
+              Email Address *
             </label>
             <input
-              type="text"
-              name="phone"
-              value={formData.phone}
+              type="email"
+              name="email"
+              value={formData.email}
               onChange={handleInputChange}
-              style={{
-                ...inputStyle,
-                borderColor: formData.phone ? "#e0e0e0" : error && !formData.phone ? "#e74c3c" : "#e0e0e0"
-              }}
-              placeholder="Enter phone number"
+              className="w-full px-4 py-3 border border-gray-200 text-sm focus:outline-none focus:border-black transition-colors"
+              placeholder="Enter email address"
               disabled={loading}
             />
           </div>
 
-          <div>
-            <label style={labelStyle}>
-              Nationality <span style={{ color: "#e74c3c" }}>*</span>
+          {/* Phone & Nationality */}
+          <div className="grid grid-cols-2 gap-6 mb-6">
+            <div>
+              <label className="block text-xs text-gray-500 mb-2">
+                Phone Number *
+              </label>
+              <input
+                type="text"
+                name="phone"
+                value={formData.phone}
+                onChange={handleInputChange}
+                className="w-full px-4 py-3 border border-gray-200 text-sm focus:outline-none focus:border-black transition-colors"
+                placeholder="Enter phone number"
+                disabled={loading}
+              />
+            </div>
+
+            <div>
+              <label className="block text-xs text-gray-500 mb-2">
+                Nationality *
+              </label>
+              <input
+                type="text"
+                name="nationality"
+                value={formData.nationality}
+                onChange={handleInputChange}
+                className="w-full px-4 py-3 border border-gray-200 text-sm focus:outline-none focus:border-black transition-colors"
+                placeholder="Enter nationality"
+                disabled={loading}
+              />
+            </div>
+          </div>
+
+          {/* Identity Type & Number */}
+          <div className="grid grid-cols-2 gap-6 mb-6">
+            <div>
+              <label className="block text-xs text-gray-500 mb-2">
+                Identity Type *
+              </label>
+              <select
+                name="identityType"
+                value={formData.identityType}
+                onChange={handleInputChange}
+                className="w-full px-4 py-3 border border-gray-200 text-sm focus:outline-none focus:border-black transition-colors bg-white"
+                disabled={loading}
+              >
+                <option value="Passport">Passport</option>
+                <option value="NIC">National ID Card</option>
+                <option value="License">Driving License</option>
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-xs text-gray-500 mb-2">
+                Identity Number *
+              </label>
+              <input
+                type="text"
+                name="identityNumber"
+                value={formData.identityNumber}
+                onChange={handleInputChange}
+                className="w-full px-4 py-3 border border-gray-200 text-sm focus:outline-none focus:border-black transition-colors"
+                placeholder="Enter identity number"
+                disabled={loading}
+              />
+            </div>
+          </div>
+
+          {/* Identity Document Upload */}
+          <div className="mb-8">
+            <label className="block text-xs text-gray-500 mb-2">
+              Identity Document Image
             </label>
             <input
-              type="text"
-              name="nationality"
-              value={formData.nationality}
-              onChange={handleInputChange}
-              style={{
-                ...inputStyle,
-                borderColor: formData.nationality ? "#e0e0e0" : error && !formData.nationality ? "#e74c3c" : "#e0e0e0"
-              }}
-              placeholder="Enter nationality"
+              type="file"
+              accept="image/*"
+              onChange={handleFileChange}
+              className="w-full px-4 py-3 border border-gray-200 text-sm focus:outline-none focus:border-black transition-colors cursor-pointer"
               disabled={loading}
             />
-          </div>
-        </div>
-
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "20px", marginBottom: "20px" }}>
-          <div>
-            <label style={labelStyle}>
-              Identity Type <span style={{ color: "#e74c3c" }}>*</span>
-            </label>
-            <select
-              name="identityType"
-              value={formData.identityType}
-              onChange={handleInputChange}
-              style={inputStyle}
-              disabled={loading}
-            >
-              <option value="Passport">Passport</option>
-              <option value="NIC">National ID Card</option>
-              <option value="License">Driving License</option>
-            </select>
+            <p className="text-xs text-gray-400 mt-2">
+              Upload a clear image of your identity document (JPG, PNG, max 5MB)
+            </p>
+            {formData.identityImage && (
+              <p className="text-xs text-black mt-2">
+                Selected: {formData.identityImage.name}
+              </p>
+            )}
           </div>
 
-          <div>
-            <label style={labelStyle}>
-              Identity Number <span style={{ color: "#e74c3c" }}>*</span>
-            </label>
-            <input
-              type="text"
-              name="identityNumber"
-              value={formData.identityNumber}
-              onChange={handleInputChange}
-              style={{
-                ...inputStyle,
-                borderColor: formData.identityNumber ? "#e0e0e0" : error && !formData.identityNumber ? "#e74c3c" : "#e0e0e0"
-              }}
-              placeholder="Enter identity number"
-              disabled={loading}
-            />
-          </div>
-        </div>
-
-        <div style={{ marginBottom: "32px" }}>
-          <label style={labelStyle}>
-            Identity Document Image
-          </label>
-          <input
-            type="file"
-            accept="image/*"
-            onChange={handleFileChange}
-            style={{
-              ...inputStyle,
-              padding: "8px 16px",
-              cursor: "pointer"
-            }}
-            disabled={loading}
-          />
-          <small style={{ 
-            fontSize: "12px", 
-            color: "#666", 
-            display: "block", 
-            marginTop: "4px" 
-          }}>
-            Upload a clear image of your identity document (JPG, PNG, max 5MB)
-          </small>
-          {formData.identityImage && (
-            <small style={{ 
-              fontSize: "12px", 
-              color: "#16a34a", 
-              display: "block", 
-              marginTop: "4px" 
-            }}>
-              Selected: {formData.identityImage.name}
-            </small>
+          {/* Error Message */}
+          {error && (
+            <div className="mb-6 p-4 border border-gray-900 bg-gray-50">
+              <p className="text-sm text-black">
+                {error}
+              </p>
+            </div>
           )}
-        </div>
 
-        {error && (
-          <div style={{
-            padding: "12px 16px",
-            backgroundColor: "#fef2f2",
-            border: "1px solid #fecaca",
-            borderRadius: "4px",
-            marginBottom: "20px"
-          }}>
-            <p style={{ 
-              color: "#dc2626", 
-              margin: "0", 
-              fontSize: "14px", 
-              fontWeight: "500" 
-            }}>
-              {error}
-            </p>
+          {/* Success Message */}
+          {response && (
+            <div className="mb-6 p-4 border border-black bg-black text-white">
+              <p className="text-sm">
+                Guest registration completed successfully
+              </p>
+            </div>
+          )}
+
+          {/* Action Buttons */}
+          <div className="flex gap-3 justify-end">
+            <button
+              onClick={resetForm}
+              disabled={loading}
+              className={`px-6 py-3 border border-gray-200 text-black text-sm hover:border-black transition-colors ${
+                loading ? 'opacity-50 cursor-not-allowed' : ''
+              }`}
+            >
+              Reset Form
+            </button>
+            
+            <button
+              onClick={handleSubmit}
+              disabled={loading}
+              className={`px-6 py-3 bg-black text-white text-sm hover:bg-gray-900 transition-colors ${
+                loading ? 'opacity-70 cursor-not-allowed' : ''
+              }`}
+            >
+              {loading ? "Processing..." : "Register Guest"}
+            </button>
           </div>
-        )}
-
-        {response && (
-          <div style={{
-            padding: "12px 16px",
-            backgroundColor: "#f0fdf4",
-            border: "1px solid #bbf7d0",
-            borderRadius: "4px",
-            marginBottom: "20px"
-          }}>
-            <p style={{ 
-              color: "#16a34a", 
-              margin: "0", 
-              fontSize: "14px", 
-              fontWeight: "500" 
-            }}>
-              Guest registration completed successfully
-            </p>
-          </div>
-        )}
-
-        <div style={{ 
-          display: "flex", 
-          gap: "12px", 
-          justifyContent: "flex-end" 
-        }}>
-          <button
-            onClick={resetForm}
-            disabled={loading}
-            style={{
-              ...buttonStyle,
-              opacity: loading ? 0.5 : 1,
-              cursor: loading ? "not-allowed" : "pointer"
-            }}
-            onMouseOver={(e) => {
-              if (!loading) {
-                e.target.style.backgroundColor = "#f8f8f8";
-              }
-            }}
-            onMouseOut={(e) => {
-              if (!loading) {
-                e.target.style.backgroundColor = "#fff";
-              }
-            }}
-          >
-            Reset Form
-          </button>
-          
-          <button
-            onClick={handleSubmit}
-            disabled={loading}
-            style={{
-              ...primaryButtonStyle,
-              opacity: loading ? 0.7 : 1,
-              cursor: loading ? "not-allowed" : "pointer"
-            }}
-            onMouseOver={(e) => {
-              if (!loading) {
-                e.target.style.backgroundColor = "#333";
-              }
-            }}
-            onMouseOut={(e) => {
-              if (!loading) {
-                e.target.style.backgroundColor = "#000";
-              }
-            }}
-          >
-            {loading ? "Processing..." : "Register Guest"}
-          </button>
         </div>
       </div>
     </div>

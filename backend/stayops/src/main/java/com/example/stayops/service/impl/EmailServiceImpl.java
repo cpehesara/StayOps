@@ -13,6 +13,7 @@ import org.springframework.core.io.ByteArrayResource;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
@@ -22,7 +23,6 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-@Transactional
 public class EmailServiceImpl implements EmailService {
 
     private final JavaMailSender mailSender;
@@ -39,6 +39,7 @@ public class EmailServiceImpl implements EmailService {
     private String hotelName;
 
     @Override
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void sendWelcomeEmailWithRegistrationLink(Guest guest) {
         try {
             log.info("Starting to send welcome email to guest: {}", guest.getEmail());
@@ -85,10 +86,10 @@ public class EmailServiceImpl implements EmailService {
 
         } catch (MessagingException e) {
             log.error("Failed to send welcome email to: {} - {}", guest.getEmail(), e.getMessage(), e);
-            throw new RuntimeException("Failed to send welcome email: " + e.getMessage(), e);
+            // Don't throw exception - allow guest creation to succeed even if email fails
         } catch (Exception e) {
             log.error("Unexpected error while sending welcome email to: {} - {}", guest.getEmail(), e.getMessage(), e);
-            throw new RuntimeException("Failed to send welcome email: " + e.getMessage(), e);
+            // Don't throw exception - allow guest creation to succeed even if email fails
         }
     }
 
@@ -118,6 +119,7 @@ public class EmailServiceImpl implements EmailService {
     }
 
     @Override
+    @Transactional
     public void markTokenAsUsed(String token) {
         log.debug("Marking token as used: {}", token);
 

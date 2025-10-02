@@ -7,6 +7,7 @@ import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -15,6 +16,8 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@ToString(exclude = {"hotel", "reservations"})
+@EqualsAndHashCode(exclude = {"hotel", "reservations"})
 public class Room {
 
     @Id
@@ -40,18 +43,14 @@ public class Room {
 
     private String description;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = true) // Made optional
-    @JoinColumn(name = "hotel_id", nullable = true) // Made nullable
+    @ManyToOne(fetch = FetchType.LAZY, optional = true)
+    @JoinColumn(name = "hotel_id", nullable = true)
     @JsonBackReference
     private Hotel hotel;
 
-    @ManyToMany
-    @JoinTable(
-            name = "room_reservations",
-            joinColumns = @JoinColumn(name = "room_id"),
-            inverseJoinColumns = @JoinColumn(name = "reservation_id")
-    )
+    // Room is NOT the owning side - Reservation owns the relationship
+    @ManyToMany(mappedBy = "rooms", fetch = FetchType.LAZY)
     @JsonIgnore
-    private List<Reservation> reservations;
-
+    @Builder.Default
+    private List<Reservation> reservations = new ArrayList<>();
 }

@@ -9,5 +9,6 @@ public interface ServiceRequestService {
     ServiceRequestDTO updateRequest(Long id, ServiceRequestDTO dto);
     ServiceRequestDTO getRequestById(Long id);
     List<ServiceRequestDTO> getAllRequests();
+    List<ServiceRequestDTO> getRequestsByServiceTypeCode(String code);
     void deleteRequest(Long id);
 }

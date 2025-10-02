@@ -1,7 +1,6 @@
 package com.example.stayops.service;
 
 import com.example.stayops.dto.RoomDTO;
-
 import java.util.List;
 
 public interface RoomService {

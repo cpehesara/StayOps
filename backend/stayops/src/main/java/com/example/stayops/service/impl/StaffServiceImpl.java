@@ -37,6 +37,7 @@ public class StaffServiceImpl implements StaffService {
                 .status(dto.getStatus())
                 .hireDate(dto.getHireDate())
                 .department(department)
+                .hotel(department.getHotel())  // FIXED: Set hotel from department
                 .build();
 
         return mapToResponseDTO(staffRepository.save(staff));
@@ -57,6 +58,7 @@ public class StaffServiceImpl implements StaffService {
         staff.setStatus(dto.getStatus());
         staff.setHireDate(dto.getHireDate());
         staff.setDepartment(department);
+        staff.setHotel(department.getHotel());  // FIXED: Set hotel from department
 
         return mapToResponseDTO(staffRepository.save(staff));
     }

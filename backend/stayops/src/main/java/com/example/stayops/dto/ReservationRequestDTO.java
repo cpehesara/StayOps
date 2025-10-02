@@ -1,3 +1,4 @@
+// ========== 2. ReservationRequestDTO.java (ENHANCED) ==========
 package com.example.stayops.dto;
 
 import com.example.stayops.enums.ReservationStatus;
@@ -14,10 +15,17 @@ import java.util.Set;
 @AllArgsConstructor
 @Builder
 public class ReservationRequestDTO {
-
     private String guestId;
     private Set<Long> roomIds;
     private LocalDate checkInDate;
     private LocalDate checkOutDate;
-    private ReservationStatus status; // Optional, can be null for PENDING
+    private ReservationStatus status;
+
+    // Additional fields for reservation details
+    private Integer adults;
+    private Integer kids;
+    private String mealPlan;
+    private String amenities;
+    private String specialRequests;
+    private String additionalNotes;
 }

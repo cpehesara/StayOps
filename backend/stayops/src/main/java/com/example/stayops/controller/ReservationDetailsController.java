@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/reservation-details")
 @RequiredArgsConstructor
-@CrossOrigin(origins = "*")
+@CrossOrigin(origins = {"*"})
 public class ReservationDetailsController {
 
     private final ReservationDetailsService reservationDetailsService;

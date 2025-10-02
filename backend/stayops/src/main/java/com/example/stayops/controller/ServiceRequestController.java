@@ -11,6 +11,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/v1/service-requests")
 @RequiredArgsConstructor
+@CrossOrigin(origins = {"*"})
 public class ServiceRequestController {
 
     private final ServiceRequestService serviceRequestService;
@@ -33,6 +34,11 @@ public class ServiceRequestController {
     @GetMapping
     public ResponseEntity<List<ServiceRequestDTO>> getAll() {
         return ResponseEntity.ok(serviceRequestService.getAllRequests());
+    }
+
+    @GetMapping("/code/{code}")
+    public ResponseEntity<List<ServiceRequestDTO>> getByServiceTypeCode(@PathVariable String code) {
+        return ResponseEntity.ok(serviceRequestService.getRequestsByServiceTypeCode(code));
     }
 
     @DeleteMapping("/{id}")

@@ -1,82 +1,9 @@
 import React, { useState } from 'react';
 
-const Billing = () => {
+const Billing = ({ bills = [] }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState('all');
   const [filterType, setFilterType] = useState('all');
-
-  const mockBills = [
-    {
-      id: 'BILL001',
-      guestName: 'John Smith',
-      roomNumber: '101',
-      checkIn: '2024-01-10',
-      checkOut: '2024-01-15',
-      billType: 'room',
-      amount: 750.00,
-      status: 'paid',
-      paymentMethod: 'Credit Card',
-      createdDate: '2024-01-15 14:30',
-      items: [
-        { description: 'Room Charges (5 nights)', amount: 500.00 },
-        { description: 'Room Service', amount: 150.00 },
-        { description: 'Minibar', amount: 75.00 },
-        { description: 'Tax', amount: 25.00 }
-      ]
-    },
-    {
-      id: 'BILL002',
-      guestName: 'Emily Johnson',
-      roomNumber: '205',
-      checkIn: '2024-01-12',
-      checkOut: '2024-01-18',
-      billType: 'service',
-      amount: 320.50,
-      status: 'pending',
-      paymentMethod: null,
-      createdDate: '2024-01-18 11:15',
-      items: [
-        { description: 'Spa Services', amount: 200.00 },
-        { description: 'Restaurant', amount: 95.50 },
-        { description: 'Tax', amount: 25.00 }
-      ]
-    },
-    {
-      id: 'BILL003',
-      guestName: 'Michael Brown',
-      roomNumber: '301',
-      checkIn: '2024-01-14',
-      checkOut: '2024-01-16',
-      billType: 'room',
-      amount: 1250.00,
-      status: 'overdue',
-      paymentMethod: null,
-      createdDate: '2024-01-16 16:45',
-      items: [
-        { description: 'Suite Charges (2 nights)', amount: 1000.00 },
-        { description: 'Conference Room', amount: 150.00 },
-        { description: 'Business Services', amount: 50.00 },
-        { description: 'Tax', amount: 50.00 }
-      ]
-    },
-    {
-      id: 'BILL004',
-      guestName: 'Sarah Davis',
-      roomNumber: '102',
-      checkIn: '2024-01-13',
-      checkOut: '2024-01-20',
-      billType: 'partial',
-      amount: 450.25,
-      status: 'partial',
-      paymentMethod: 'Cash',
-      createdDate: '2024-01-17 09:30',
-      items: [
-        { description: 'Additional Services', amount: 300.00 },
-        { description: 'Laundry', amount: 125.25 },
-        { description: 'Tax', amount: 25.00 }
-      ]
-    }
-  ];
 
   const getBillIcon = (type) => {
     switch (type) {
@@ -104,7 +31,7 @@ const Billing = () => {
     console.log(`Printing bill ${billId}`);
   };
 
-  const filteredBills = mockBills.filter(bill => {
+  const filteredBills = bills.filter(bill => {
     const matchesSearch = bill.guestName.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          bill.roomNumber.includes(searchTerm) ||
                          bill.id.toLowerCase().includes(searchTerm.toLowerCase());
@@ -113,203 +40,168 @@ const Billing = () => {
     return matchesSearch && matchesStatus && matchesType;
   });
 
-  const totalRevenue = mockBills.filter(b => b.status === 'paid').reduce((sum, bill) => sum + bill.amount, 0);
-  const pendingAmount = mockBills.filter(b => b.status === 'pending').reduce((sum, bill) => sum + bill.amount, 0);
-  const overdueAmount = mockBills.filter(b => b.status === 'overdue').reduce((sum, bill) => sum + bill.amount, 0);
+  const totalRevenue = bills.filter(b => b.status === 'paid').reduce((sum, bill) => sum + bill.amount, 0);
+  const pendingAmount = bills.filter(b => b.status === 'pending').reduce((sum, bill) => sum + bill.amount, 0);
+  const overdueAmount = bills.filter(b => b.status === 'overdue').reduce((sum, bill) => sum + bill.amount, 0);
 
   return (
-    <div className="min-h-screen bg-white p-6">
-      {/* Header */}
-      <div className="mb-8 border-b border-black pb-4">
-        <h1 className="text-4xl font-bold text-black mb-2">
-          BILLING MANAGEMENT
-        </h1>
-        <p className="text-gray-600 uppercase tracking-wide">
-          Manage guest bills, payments and financial transactions
-        </p>
-      </div>
+    <div className="min-h-screen bg-white">
+      <div className="max-w-7xl mx-auto px-8 py-12">
+        {/* Header */}
+        <div className="mb-16">
+          <h1 className="text-5xl font-light tracking-tight text-black mb-3">
+            Billing
+          </h1>
+          <p className="text-gray-500 text-sm">
+            Manage payments and transactions
+          </p>
+        </div>
 
-      {/* Action Bar */}
-      <div className="flex flex-wrap gap-4 mb-8">
-        {/* Search */}
-        <div className="flex-1 min-w-80">
+        {/* Stats Grid */}
+        <div className="grid grid-cols-4 gap-6 mb-16">
+          <div className="border border-gray-200 p-6 hover:border-black transition-colors">
+            <div className="text-xs text-gray-500 mb-2 uppercase tracking-wider">Revenue</div>
+            <div className="text-3xl font-light">${totalRevenue.toFixed(2)}</div>
+          </div>
+          
+          <div className="border border-gray-200 p-6 hover:border-black transition-colors">
+            <div className="text-xs text-gray-500 mb-2 uppercase tracking-wider">Pending</div>
+            <div className="text-3xl font-light">${pendingAmount.toFixed(2)}</div>
+          </div>
+          
+          <div className="border border-gray-200 p-6 hover:border-black transition-colors">
+            <div className="text-xs text-gray-500 mb-2 uppercase tracking-wider">Overdue</div>
+            <div className="text-3xl font-light">${overdueAmount.toFixed(2)}</div>
+          </div>
+
+          <div className="border border-gray-200 p-6 hover:border-black transition-colors">
+            <div className="text-xs text-gray-500 mb-2 uppercase tracking-wider">Total Bills</div>
+            <div className="text-3xl font-light">{bills.length}</div>
+          </div>
+        </div>
+
+        {/* Controls */}
+        <div className="flex gap-4 mb-12">
           <input
             type="text"
-            placeholder="Search by guest, room, or bill ID..."
+            placeholder="Search bills..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full px-4 py-3 border-2 border-black bg-white text-black placeholder-gray-500 focus:outline-none focus:border-gray-600"
+            className="flex-1 px-4 py-3 border border-gray-200 text-sm focus:outline-none focus:border-black transition-colors"
           />
+
+          <select
+            value={filterStatus}
+            onChange={(e) => setFilterStatus(e.target.value)}
+            className="px-4 py-3 border border-gray-200 text-sm focus:outline-none focus:border-black transition-colors bg-white"
+          >
+            <option value="all">All Status</option>
+            <option value="paid">Paid</option>
+            <option value="pending">Pending</option>
+            <option value="partial">Partial</option>
+            <option value="overdue">Overdue</option>
+          </select>
+
+          <select
+            value={filterType}
+            onChange={(e) => setFilterType(e.target.value)}
+            className="px-4 py-3 border border-gray-200 text-sm focus:outline-none focus:border-black transition-colors bg-white"
+          >
+            <option value="all">All Types</option>
+            <option value="room">Room</option>
+            <option value="service">Service</option>
+            <option value="partial">Partial</option>
+            <option value="restaurant">Restaurant</option>
+          </select>
+
+          <button className="px-6 py-3 bg-black text-white text-sm hover:bg-gray-900 transition-colors">
+            New Bill
+          </button>
         </div>
 
-        {/* Status Filter */}
-        <select
-          value={filterStatus}
-          onChange={(e) => setFilterStatus(e.target.value)}
-          className="px-4 py-3 border-2 border-black bg-white text-black focus:outline-none focus:border-gray-600"
-        >
-          <option value="all">ALL STATUS</option>
-          <option value="paid">PAID</option>
-          <option value="pending">PENDING</option>
-          <option value="partial">PARTIAL</option>
-          <option value="overdue">OVERDUE</option>
-        </select>
-
-        {/* Type Filter */}
-        <select
-          value={filterType}
-          onChange={(e) => setFilterType(e.target.value)}
-          className="px-4 py-3 border-2 border-black bg-white text-black focus:outline-none focus:border-gray-600"
-        >
-          <option value="all">ALL TYPES</option>
-          <option value="room">ROOM CHARGES</option>
-          <option value="service">SERVICE CHARGES</option>
-          <option value="partial">PARTIAL BILLS</option>
-          <option value="restaurant">RESTAURANT</option>
-        </select>
-
-        {/* New Bill Button */}
-        <button className="px-6 py-3 bg-black text-white font-bold uppercase text-sm tracking-wide hover:bg-gray-800 transition-colors">
-          + NEW BILL
-        </button>
-      </div>
-
-      {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-        <div className="border-2 border-black p-6 bg-white">
-          <div className="text-center">
-            <div className="text-4xl mb-2">💰</div>
-            <h3 className="text-2xl font-bold text-black mb-2">
-              ${totalRevenue.toFixed(2)}
-            </h3>
-            <p className="text-black font-semibold uppercase tracking-wide text-sm">Total Revenue</p>
-          </div>
-        </div>
-        
-        <div className="border-2 border-black p-6 bg-white">
-          <div className="text-center">
-            <div className="text-4xl mb-2">⏳</div>
-            <h3 className="text-2xl font-bold text-black mb-2">
-              ${pendingAmount.toFixed(2)}
-            </h3>
-            <p className="text-black font-semibold uppercase tracking-wide text-sm">Pending Payment</p>
-          </div>
-        </div>
-        
-        <div className="border-2 border-black p-6 bg-white">
-          <div className="text-center">
-            <div className="text-4xl mb-2">⚠️</div>
-            <h3 className="text-2xl font-bold text-black mb-2">
-              ${overdueAmount.toFixed(2)}
-            </h3>
-            <p className="text-black font-semibold uppercase tracking-wide text-sm">Overdue Amount</p>
-          </div>
-        </div>
-
-        <div className="border-2 border-black p-6 bg-white">
-          <div className="text-center">
-            <div className="text-4xl mb-2">📊</div>
-            <h3 className="text-2xl font-bold text-black mb-2">
-              {mockBills.length}
-            </h3>
-            <p className="text-black font-semibold uppercase tracking-wide text-sm">Total Bills</p>
-          </div>
-        </div>
-      </div>
-
-      {/* Bills List */}
-      <div className="space-y-4">
-        {filteredBills.length === 0 ? (
-          <div className="border-2 border-black p-12 text-center bg-white">
-            <p className="text-black font-semibold uppercase tracking-wide">No bills found</p>
-          </div>
-        ) : (
-          filteredBills.map((bill) => (
-            <div key={bill.id} className="border-2 border-black p-6 bg-white hover:bg-gray-50 transition-colors">
-              <div className="flex flex-col lg:flex-row gap-6">
-                {/* Left Content */}
-                <div className="flex-1">
-                  <div className="flex items-start gap-4 mb-4">
-                    <div className="text-2xl">
-                      {getBillIcon(bill.billType)}
-                    </div>
+        {/* Bills List */}
+        <div className="space-y-4">
+          {filteredBills.length === 0 ? (
+            <div className="py-24 text-center">
+              <p className="text-gray-400 text-sm">No bills found</p>
+            </div>
+          ) : (
+            filteredBills.map((bill) => (
+              <div 
+                key={bill.id} 
+                className="border border-gray-200 hover:border-black transition-colors group"
+              >
+                <div className="p-8">
+                  <div className="flex items-start justify-between mb-6">
                     <div className="flex-1">
-                      <div className="flex flex-wrap items-center gap-4 mb-2">
-                        <h3 className="text-xl font-bold text-black">
-                          {bill.guestName.toUpperCase()} - ROOM {bill.roomNumber}
+                      <div className="flex items-center gap-4 mb-2">
+                        <h3 className="text-xl font-light tracking-tight">
+                          {bill.guestName}
                         </h3>
-                        <span className="text-sm font-bold text-gray-600 uppercase tracking-wide">
+                        <span className="text-xs text-gray-400">
                           {bill.id}
                         </span>
                       </div>
-                      <p className="text-gray-600 uppercase tracking-wide text-sm font-semibold mb-2">
-                        {bill.billType.replace('-', ' ')} BILL
+                      <p className="text-sm text-gray-500">
+                        Room {bill.roomNumber} · {bill.billType}
                       </p>
-                      <div className="text-3xl font-bold text-black">
+                    </div>
+                    
+                    <div className="text-right">
+                      <div className="text-3xl font-light mb-2">
                         ${bill.amount.toFixed(2)}
                       </div>
+                      <span className={`inline-block px-3 py-1 text-xs ${
+                        bill.status === 'paid' ? 'bg-black text-white' : 
+                        bill.status === 'overdue' ? 'bg-gray-900 text-white' : 
+                        bill.status === 'partial' ? 'bg-gray-300 text-black' : 
+                        'border border-gray-300 text-black'
+                      }`}>
+                        {bill.status}
+                      </span>
                     </div>
                   </div>
                   
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 text-sm mb-4">
+                  <div className="grid grid-cols-4 gap-8 text-sm mb-6 pb-6 border-b border-gray-100">
                     <div>
-                      <span className="font-bold text-black uppercase">Check-in:</span>
-                      <br />
-                      <span className="text-gray-600">{bill.checkIn}</span>
+                      <div className="text-xs text-gray-400 mb-1">Check In</div>
+                      <div className="text-gray-900">{bill.checkIn}</div>
                     </div>
                     <div>
-                      <span className="font-bold text-black uppercase">Check-out:</span>
-                      <br />
-                      <span className="text-gray-600">{bill.checkOut}</span>
+                      <div className="text-xs text-gray-400 mb-1">Check Out</div>
+                      <div className="text-gray-900">{bill.checkOut}</div>
                     </div>
                     <div>
-                      <span className="font-bold text-black uppercase">Created:</span>
-                      <br />
-                      <span className="text-gray-600">{bill.createdDate}</span>
+                      <div className="text-xs text-gray-400 mb-1">Created</div>
+                      <div className="text-gray-900">{bill.createdDate}</div>
                     </div>
                     {bill.paymentMethod && (
                       <div>
-                        <span className="font-bold text-black uppercase">Payment:</span>
-                        <br />
-                        <span className="text-gray-600">{bill.paymentMethod}</span>
+                        <div className="text-xs text-gray-400 mb-1">Payment</div>
+                        <div className="text-gray-900">{bill.paymentMethod}</div>
                       </div>
                     )}
                   </div>
 
                   {/* Bill Items */}
-                  <div className="border-t border-gray-300 pt-3">
-                    <p className="font-bold text-black uppercase text-sm mb-2">Bill Items:</p>
-                    <div className="space-y-1">
+                  <div className="mb-6">
+                    <div className="text-xs text-gray-400 mb-3 uppercase tracking-wider">Items</div>
+                    <div className="space-y-2">
                       {bill.items.map((item, index) => (
                         <div key={index} className="flex justify-between text-sm">
                           <span className="text-gray-600">{item.description}</span>
-                          <span className="font-semibold text-black">${item.amount.toFixed(2)}</span>
+                          <span className="text-gray-900">${item.amount.toFixed(2)}</span>
                         </div>
                       ))}
                     </div>
                   </div>
-                </div>
-                
-                {/* Right Content */}
-                <div className="flex flex-col gap-4 lg:items-end">
-                  {/* Status Badge */}
-                  <div className="flex flex-wrap gap-2">
-                    <span className={`px-4 py-2 border-2 border-black text-sm font-bold uppercase tracking-wide ${
-                      bill.status === 'paid' ? 'bg-black text-white' : 
-                      bill.status === 'overdue' ? 'bg-gray-800 text-white' : 
-                      bill.status === 'partial' ? 'bg-gray-200 text-black' : 
-                      'bg-white text-black'
-                    }`}>
-                      {bill.status}
-                    </span>
-                  </div>
                   
-                  {/* Action Buttons */}
-                  <div className="flex flex-wrap gap-2">
+                  {/* Actions */}
+                  <div className="flex gap-3">
                     {(bill.status === 'pending' || bill.status === 'partial') && (
                       <button 
                         onClick={() => handlePayNow(bill.id)}
-                        className="px-4 py-2 bg-black text-white font-bold uppercase text-xs tracking-wide hover:bg-gray-800 transition-colors"
+                        className="px-4 py-2 bg-black text-white text-xs hover:bg-gray-900 transition-colors"
                       >
                         Pay Now
                       </button>
@@ -317,32 +209,106 @@ const Billing = () => {
                     {bill.status === 'overdue' && (
                       <button 
                         onClick={() => handleSendReminder(bill.id)}
-                        className="px-4 py-2 bg-gray-800 text-white font-bold uppercase text-xs tracking-wide hover:bg-black transition-colors"
+                        className="px-4 py-2 bg-gray-900 text-white text-xs hover:bg-black transition-colors"
                       >
                         Send Reminder
                       </button>
                     )}
                     <button 
                       onClick={() => handlePrintBill(bill.id)}
-                      className="px-4 py-2 border-2 border-black bg-white text-black font-bold uppercase text-xs tracking-wide hover:bg-gray-100 transition-colors"
+                      className="px-4 py-2 border border-gray-200 text-black text-xs hover:border-black transition-colors"
                     >
                       Print
                     </button>
                     <button 
                       onClick={() => handleViewDetails(bill.id)}
-                      className="px-4 py-2 border-2 border-black bg-white text-black font-bold uppercase text-xs tracking-wide hover:bg-gray-100 transition-colors"
+                      className="px-4 py-2 border border-gray-200 text-black text-xs hover:border-black transition-colors"
                     >
                       Details
                     </button>
                   </div>
                 </div>
               </div>
-            </div>
-          ))
-        )}
+            ))
+          )}
+        </div>
       </div>
     </div>
   );
 };
 
-export default Billing;
+// Demo with sample data
+const mockBills = [
+  {
+    id: 'BILL001',
+    guestName: 'John Smith',
+    roomNumber: '101',
+    checkIn: '2024-01-10',
+    checkOut: '2024-01-15',
+    billType: 'room',
+    amount: 750.00,
+    status: 'paid',
+    paymentMethod: 'Credit Card',
+    createdDate: '2024-01-15 14:30',
+    items: [
+      { description: 'Room Charges (5 nights)', amount: 500.00 },
+      { description: 'Room Service', amount: 150.00 },
+      { description: 'Minibar', amount: 75.00 },
+      { description: 'Tax', amount: 25.00 }
+    ]
+  },
+  {
+    id: 'BILL002',
+    guestName: 'Emily Johnson',
+    roomNumber: '205',
+    checkIn: '2024-01-12',
+    checkOut: '2024-01-18',
+    billType: 'service',
+    amount: 320.50,
+    status: 'pending',
+    paymentMethod: null,
+    createdDate: '2024-01-18 11:15',
+    items: [
+      { description: 'Spa Services', amount: 200.00 },
+      { description: 'Restaurant', amount: 95.50 },
+      { description: 'Tax', amount: 25.00 }
+    ]
+  },
+  {
+    id: 'BILL003',
+    guestName: 'Michael Brown',
+    roomNumber: '301',
+    checkIn: '2024-01-14',
+    checkOut: '2024-01-16',
+    billType: 'room',
+    amount: 1250.00,
+    status: 'overdue',
+    paymentMethod: null,
+    createdDate: '2024-01-16 16:45',
+    items: [
+      { description: 'Suite Charges (2 nights)', amount: 1000.00 },
+      { description: 'Conference Room', amount: 150.00 },
+      { description: 'Business Services', amount: 50.00 },
+      { description: 'Tax', amount: 50.00 }
+    ]
+  },
+  {
+    id: 'BILL004',
+    guestName: 'Sarah Davis',
+    roomNumber: '102',
+    checkIn: '2024-01-13',
+    checkOut: '2024-01-20',
+    billType: 'partial',
+    amount: 450.25,
+    status: 'partial',
+    paymentMethod: 'Cash',
+    createdDate: '2024-01-17 09:30',
+    items: [
+      { description: 'Additional Services', amount: 300.00 },
+      { description: 'Laundry', amount: 125.25 },
+      { description: 'Tax', amount: 25.00 }
+    ]
+  }
+];
+
+export default () => <Billing bills={mockBills} />;

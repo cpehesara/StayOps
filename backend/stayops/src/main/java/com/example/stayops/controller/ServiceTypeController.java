@@ -15,7 +15,7 @@ import java.util.List;
 @RequestMapping("/api/v1/service-types")
 @RequiredArgsConstructor
 @Validated
-@CrossOrigin // allow cross origin - adjust as necessary
+@CrossOrigin(origins = {"*"}) // allow cross origin - adjust as necessary
 public class ServiceTypeController {
 
     private final ServiceTypeService service;

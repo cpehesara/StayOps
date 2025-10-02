@@ -58,6 +58,14 @@ public class ServiceRequestServiceImpl implements ServiceRequestService {
     }
 
     @Override
+    public List<ServiceRequestDTO> getRequestsByServiceTypeCode(String code) {
+        return serviceRequestRepository.findByServiceTypeCode(code)
+                .stream()
+                .map(this::toDTO)
+                .collect(Collectors.toList());
+    }
+
+    @Override
     public void deleteRequest(Long id) {
         serviceRequestRepository.deleteById(id);
     }

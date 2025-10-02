@@ -6,8 +6,10 @@ import com.example.stayops.entity.Room;
 import com.example.stayops.repository.HotelRepository;
 import com.example.stayops.repository.RoomRepository;
 import com.example.stayops.service.RoomService;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -18,6 +20,101 @@ public class RoomServiceImpl implements RoomService {
 
     private final RoomRepository roomRepository;
     private final HotelRepository hotelRepository;
+
+    @Override
+    @Transactional
+    public RoomDTO createRoom(RoomDTO roomDTO) {
+        Room room = Room.builder()
+                .roomNumber(roomDTO.getRoomNumber())
+                .type(roomDTO.getType())
+                .capacity(roomDTO.getCapacity())
+                .pricePerNight(roomDTO.getPricePerNight())
+                .availabilityStatus(roomDTO.getAvailabilityStatus())
+                .floorNumber(roomDTO.getFloorNumber())
+                .description(roomDTO.getDescription())
+                .build();
+
+        if (roomDTO.getHotelId() != null) {
+            Hotel hotel = hotelRepository.findById(roomDTO.getHotelId())
+                    .orElseThrow(() -> new EntityNotFoundException("Hotel not found: " + roomDTO.getHotelId()));
+            room.setHotel(hotel);
+        }
+
+        Room saved = roomRepository.save(room);
+        return mapToDTO(saved);
+    }
+
+    @Override
+    @Transactional
+    public RoomDTO updateRoom(Long id, RoomDTO roomDTO) {
+        Room room = roomRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Room not found: " + id));
+
+        room.setRoomNumber(roomDTO.getRoomNumber());
+        room.setType(roomDTO.getType());
+        room.setCapacity(roomDTO.getCapacity());
+        room.setPricePerNight(roomDTO.getPricePerNight());
+        room.setAvailabilityStatus(roomDTO.getAvailabilityStatus());
+        room.setFloorNumber(roomDTO.getFloorNumber());
+        room.setDescription(roomDTO.getDescription());
+
+        if (roomDTO.getHotelId() != null) {
+            Hotel hotel = hotelRepository.findById(roomDTO.getHotelId())
+                    .orElseThrow(() -> new EntityNotFoundException("Hotel not found: " + roomDTO.getHotelId()));
+            room.setHotel(hotel);
+        }
+
+        Room saved = roomRepository.save(room);
+        return mapToDTO(saved);
+    }
+
+    @Override
+    @Transactional
+    public void deleteRoom(Long id) {
+        Room room = roomRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Room not found: " + id));
+        roomRepository.delete(room);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public RoomDTO getRoomById(Long id) {
+        Room room = roomRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Room not found: " + id));
+        return mapToDTO(room);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<RoomDTO> getAllRooms() {
+        return roomRepository.findAll().stream()
+                .map(this::mapToDTO)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<RoomDTO> getAvailableRooms() {
+        return roomRepository.findByAvailabilityStatus("AVAILABLE").stream()
+                .map(this::mapToDTO)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<RoomDTO> getRoomsByType(String type) {
+        return roomRepository.findByType(type).stream()
+                .map(this::mapToDTO)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<RoomDTO> getRoomsByHotel(Long hotelId) {
+        return roomRepository.findByHotelId(hotelId).stream()
+                .map(this::mapToDTO)
+                .collect(Collectors.toList());
+    }
 
     private RoomDTO mapToDTO(Room room) {
         return RoomDTO.builder()
@@ -31,78 +128,5 @@ public class RoomServiceImpl implements RoomService {
                 .description(room.getDescription())
                 .hotelId(room.getHotel() != null ? room.getHotel().getId() : null)
                 .build();
-    }
-
-    private Room mapToEntity(RoomDTO dto) {
-        Hotel hotel = dto.getHotelId() != null
-                ? hotelRepository.findById(dto.getHotelId()).orElse(null)
-                : null;
-
-        return Room.builder()
-                .id(dto.getId())
-                .roomNumber(dto.getRoomNumber())
-                .type(dto.getType())
-                .capacity(dto.getCapacity())
-                .pricePerNight(dto.getPricePerNight())
-                .availabilityStatus(dto.getAvailabilityStatus())
-                .floorNumber(dto.getFloorNumber())
-                .description(dto.getDescription())
-                .hotel(hotel)
-                .build();
-    }
-
-    @Override
-    public RoomDTO createRoom(RoomDTO roomDTO) {
-        Room room = mapToEntity(roomDTO);
-        return mapToDTO(roomRepository.save(room));
-    }
-
-    @Override
-    public RoomDTO updateRoom(Long id, RoomDTO roomDTO) {
-        Room existing = roomRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Room not found"));
-        existing.setRoomNumber(roomDTO.getRoomNumber());
-        existing.setType(roomDTO.getType());
-        existing.setCapacity(roomDTO.getCapacity());
-        existing.setPricePerNight(roomDTO.getPricePerNight());
-        existing.setAvailabilityStatus(roomDTO.getAvailabilityStatus());
-        existing.setFloorNumber(roomDTO.getFloorNumber());
-        existing.setDescription(roomDTO.getDescription());
-        if (roomDTO.getHotelId() != null) {
-            existing.setHotel(hotelRepository.findById(roomDTO.getHotelId()).orElse(null));
-        }
-        return mapToDTO(roomRepository.save(existing));
-    }
-
-    @Override
-    public void deleteRoom(Long id) {
-        roomRepository.deleteById(id);
-    }
-
-    @Override
-    public RoomDTO getRoomById(Long id) {
-        return roomRepository.findById(id)
-                .map(this::mapToDTO)
-                .orElseThrow(() -> new RuntimeException("Room not found"));
-    }
-
-    @Override
-    public List<RoomDTO> getAllRooms() {
-        return roomRepository.findAll().stream().map(this::mapToDTO).collect(Collectors.toList());
-    }
-
-    @Override
-    public List<RoomDTO> getAvailableRooms() {
-        return roomRepository.findByAvailabilityStatus("Available").stream().map(this::mapToDTO).collect(Collectors.toList());
-    }
-
-    @Override
-    public List<RoomDTO> getRoomsByType(String type) {
-        return roomRepository.findByType(type).stream().map(this::mapToDTO).collect(Collectors.toList());
-    }
-
-    @Override
-    public List<RoomDTO> getRoomsByHotel(Long hotelId) {
-        return roomRepository.findByHotelId(hotelId).stream().map(this::mapToDTO).collect(Collectors.toList());
     }
 }
