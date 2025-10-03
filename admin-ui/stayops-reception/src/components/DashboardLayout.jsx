@@ -28,7 +28,7 @@ const sidebarItems = [
   { text: 'QR Scanner', icon: Users, path: '/dashboard/qr-scanner'}
 ];
 
-export default function DashboardLayout() {
+export default function DashboardLayout({ onLogout }) {
   const [isOpen, setIsOpen] = useState(true);
   const navigate = useNavigate();
   const location = useLocation();
@@ -38,8 +38,12 @@ export default function DashboardLayout() {
   };
 
   const handleSignOut = () => {
-    // Add your sign out logic here
-    navigate('/guest-registration');
+    if (window.confirm('Are you sure you want to logout?')) {
+      if (onLogout) {
+        onLogout();
+      }
+      navigate('/login');
+    }
   };
 
   const toggleSidebar = () => {
@@ -192,6 +196,37 @@ export default function DashboardLayout() {
             flexShrink: 0,
           }}
         >
+          {/* User Info */}
+          <div
+            style={{
+              padding: '8px 12px',
+              marginBottom: '8px',
+              backgroundColor: '#f8f9fa',
+              borderRadius: '6px',
+              border: '1px solid #e9ecef',
+            }}
+          >
+            <div
+              style={{
+                fontSize: '12px',
+                color: '#6c757d',
+                marginBottom: '2px',
+              }}
+            >
+              Logged in as:
+            </div>
+            <div
+              style={{
+                fontSize: '13px',
+                fontWeight: '500',
+                color: '#212529',
+                wordBreak: 'break-word',
+              }}
+            >
+              {localStorage.getItem('userEmail') || 'reception@gmail.com'}
+            </div>
+          </div>
+          
           <button
             onClick={handleSignOut}
             style={{

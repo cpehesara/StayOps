@@ -32,26 +32,26 @@ const Settings = () => {
   };
 
   return (
-    <div style={{ padding: '24px', backgroundColor: '#fafafa', minHeight: '100vh' }}>
-      <div style={{ marginBottom: '24px' }}>
-        <h1 style={{ fontSize: '28px', fontWeight: '300', color: '#333', margin: '0 0 8px 0' }}>
+    <div style={{ padding: '32px', backgroundColor: '#fafafa', minHeight: '100vh' }}>
+      <div style={{ marginBottom: '32px' }}>
+        <h1 style={{ fontSize: '20px', fontWeight: '500', color: '#1a1a1a', margin: '0 0 6px 0' }}>
           Application Settings
         </h1>
-        <p style={{ fontSize: '16px', color: '#666', margin: 0 }}>
+        <p style={{ fontSize: '13px', color: '#999', margin: 0 }}>
           Configure system preferences and user settings
         </p>
       </div>
 
-      <div style={{ display: 'grid', gap: '24px', maxWidth: '800px' }}>
+      <div style={{ display: 'grid', gap: '20px', maxWidth: '800px' }}>
         {/* Profile Settings */}
-        <div style={{ backgroundColor: 'white', padding: '24px', borderRadius: '8px', border: '1px solid #e0e0e0' }}>
-          <div style={{ display: 'flex', alignItems: 'center', marginBottom: '16px' }}>
-            <AccountCircle style={{ fontSize: '24px', color: '#2196f3', marginRight: '8px' }} />
-            <h3 style={{ margin: 0, fontSize: '18px', fontWeight: '500' }}>Profile Settings</h3>
+        <div style={{ backgroundColor: 'white', padding: '24px', borderRadius: '6px', border: '1px solid #e8e8e8' }}>
+          <div style={{ display: 'flex', alignItems: 'center', marginBottom: '20px' }}>
+            <AccountCircle style={{ fontSize: '20px', color: '#1a1a1a', marginRight: '8px' }} />
+            <h3 style={{ margin: 0, fontSize: '15px', fontWeight: '500', color: '#1a1a1a' }}>Profile Settings</h3>
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
             <div>
-              <label style={{ display: 'block', marginBottom: '8px', fontSize: '14px', fontWeight: '500' }}>
+              <label style={{ display: 'block', marginBottom: '6px', fontSize: '13px', fontWeight: '500', color: '#4a4a4a' }}>
                 Full Name
               </label>
               <input
@@ -59,15 +59,19 @@ const Settings = () => {
                 defaultValue="John Doe"
                 style={{
                   width: '100%',
-                  padding: '12px',
-                  border: '1px solid #ddd',
+                  padding: '10px 12px',
+                  border: '1px solid #e0e0e0',
                   borderRadius: '4px',
-                  fontSize: '14px'
+                  fontSize: '13px',
+                  outline: 'none',
+                  boxSizing: 'border-box'
                 }}
+                onFocus={(e) => e.target.style.borderColor = '#1a1a1a'}
+                onBlur={(e) => e.target.style.borderColor = '#e0e0e0'}
               />
             </div>
             <div>
-              <label style={{ display: 'block', marginBottom: '8px', fontSize: '14px', fontWeight: '500' }}>
+              <label style={{ display: 'block', marginBottom: '6px', fontSize: '13px', fontWeight: '500', color: '#4a4a4a' }}>
                 Email
               </label>
               <input
@@ -75,25 +79,43 @@ const Settings = () => {
                 defaultValue="john.doe@hotel.com"
                 style={{
                   width: '100%',
-                  padding: '12px',
-                  border: '1px solid #ddd',
+                  padding: '10px 12px',
+                  border: '1px solid #e0e0e0',
                   borderRadius: '4px',
-                  fontSize: '14px'
+                  fontSize: '13px',
+                  outline: 'none',
+                  boxSizing: 'border-box'
                 }}
+                onFocus={(e) => e.target.style.borderColor = '#1a1a1a'}
+                onBlur={(e) => e.target.style.borderColor = '#e0e0e0'}
               />
             </div>
           </div>
         </div>
 
         {/* Notification Settings */}
-        <div style={{ backgroundColor: 'white', padding: '24px', borderRadius: '8px', border: '1px solid #e0e0e0' }}>
-          <div style={{ display: 'flex', alignItems: 'center', marginBottom: '16px' }}>
-            <Notifications style={{ fontSize: '24px', color: '#ff9800', marginRight: '8px' }} />
-            <h3 style={{ margin: 0, fontSize: '18px', fontWeight: '500' }}>Notification Preferences</h3>
+        <div style={{ backgroundColor: 'white', padding: '24px', borderRadius: '6px', border: '1px solid #e8e8e8' }}>
+          <div style={{ display: 'flex', alignItems: 'center', marginBottom: '20px' }}>
+            <Notifications style={{ fontSize: '20px', color: '#1a1a1a', marginRight: '8px' }} />
+            <h3 style={{ margin: 0, fontSize: '15px', fontWeight: '500', color: '#1a1a1a' }}>Notification Preferences</h3>
           </div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
             {Object.entries(settings.notifications).map(([key, value]) => (
-              <label key={key} style={{ display: 'flex', alignItems: 'center', fontSize: '14px' }}>
+              <label 
+                key={key} 
+                style={{ 
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  fontSize: '13px', 
+                  color: '#4a4a4a',
+                  cursor: 'pointer',
+                  padding: '8px 12px',
+                  borderRadius: '4px',
+                  transition: 'background-color 0.2s'
+                }}
+                onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#fafafa'}
+                onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+              >
                 <input
                   type="checkbox"
                   checked={value}
@@ -101,7 +123,12 @@ const Settings = () => {
                     ...settings,
                     notifications: { ...settings.notifications, [key]: e.target.checked }
                   })}
-                  style={{ marginRight: '8px' }}
+                  style={{ 
+                    marginRight: '10px',
+                    cursor: 'pointer',
+                    width: '16px',
+                    height: '16px'
+                  }}
                 />
                 {key.charAt(0).toUpperCase() + key.slice(1)} Notifications
               </label>
@@ -110,14 +137,14 @@ const Settings = () => {
         </div>
 
         {/* Appearance Settings */}
-        <div style={{ backgroundColor: 'white', padding: '24px', borderRadius: '8px', border: '1px solid #e0e0e0' }}>
-          <div style={{ display: 'flex', alignItems: 'center', marginBottom: '16px' }}>
-            <Palette style={{ fontSize: '24px', color: '#9c27b0', marginRight: '8px' }} />
-            <h3 style={{ margin: 0, fontSize: '18px', fontWeight: '500' }}>Appearance</h3>
+        <div style={{ backgroundColor: 'white', padding: '24px', borderRadius: '6px', border: '1px solid #e8e8e8' }}>
+          <div style={{ display: 'flex', alignItems: 'center', marginBottom: '20px' }}>
+            <Palette style={{ fontSize: '20px', color: '#1a1a1a', marginRight: '8px' }} />
+            <h3 style={{ margin: 0, fontSize: '15px', fontWeight: '500', color: '#1a1a1a' }}>Appearance</h3>
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
             <div>
-              <label style={{ display: 'block', marginBottom: '8px', fontSize: '14px', fontWeight: '500' }}>
+              <label style={{ display: 'block', marginBottom: '6px', fontSize: '13px', fontWeight: '500', color: '#4a4a4a' }}>
                 Theme
               </label>
               <select
@@ -128,12 +155,18 @@ const Settings = () => {
                 })}
                 style={{
                   width: '100%',
-                  padding: '12px',
-                  border: '1px solid #ddd',
+                  padding: '10px 12px',
+                  border: '1px solid #e0e0e0',
                   borderRadius: '4px',
-                  fontSize: '14px',
-                  backgroundColor: 'white'
+                  fontSize: '13px',
+                  backgroundColor: 'white',
+                  outline: 'none',
+                  cursor: 'pointer',
+                  boxSizing: 'border-box',
+                  color: '#1a1a1a'
                 }}
+                onFocus={(e) => e.target.style.borderColor = '#1a1a1a'}
+                onBlur={(e) => e.target.style.borderColor = '#e0e0e0'}
               >
                 <option value="light">Light</option>
                 <option value="dark">Dark</option>
@@ -141,7 +174,7 @@ const Settings = () => {
               </select>
             </div>
             <div>
-              <label style={{ display: 'block', marginBottom: '8px', fontSize: '14px', fontWeight: '500' }}>
+              <label style={{ display: 'block', marginBottom: '6px', fontSize: '13px', fontWeight: '500', color: '#4a4a4a' }}>
                 Language
               </label>
               <select
@@ -152,12 +185,18 @@ const Settings = () => {
                 })}
                 style={{
                   width: '100%',
-                  padding: '12px',
-                  border: '1px solid #ddd',
+                  padding: '10px 12px',
+                  border: '1px solid #e0e0e0',
                   borderRadius: '4px',
-                  fontSize: '14px',
-                  backgroundColor: 'white'
+                  fontSize: '13px',
+                  backgroundColor: 'white',
+                  outline: 'none',
+                  cursor: 'pointer',
+                  boxSizing: 'border-box',
+                  color: '#1a1a1a'
                 }}
+                onFocus={(e) => e.target.style.borderColor = '#1a1a1a'}
+                onBlur={(e) => e.target.style.borderColor = '#e0e0e0'}
               >
                 <option value="en">English</option>
                 <option value="es">Spanish</option>
@@ -167,26 +206,94 @@ const Settings = () => {
           </div>
         </div>
 
+        {/* Security Settings */}
+        <div style={{ backgroundColor: 'white', padding: '24px', borderRadius: '6px', border: '1px solid #e8e8e8' }}>
+          <div style={{ display: 'flex', alignItems: 'center', marginBottom: '20px' }}>
+            <Security style={{ fontSize: '20px', color: '#1a1a1a', marginRight: '8px' }} />
+            <h3 style={{ margin: 0, fontSize: '15px', fontWeight: '500', color: '#1a1a1a' }}>Security</h3>
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+            <label 
+              style={{ 
+                display: 'flex', 
+                alignItems: 'center', 
+                fontSize: '13px', 
+                color: '#4a4a4a',
+                cursor: 'pointer',
+                padding: '8px 12px',
+                borderRadius: '4px',
+                transition: 'background-color 0.2s'
+              }}
+              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#fafafa'}
+              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+            >
+              <input
+                type="checkbox"
+                checked={settings.security.twoFactor}
+                onChange={(e) => setSettings({
+                  ...settings,
+                  security: { ...settings.security, twoFactor: e.target.checked }
+                })}
+                style={{ 
+                  marginRight: '10px',
+                  cursor: 'pointer',
+                  width: '16px',
+                  height: '16px'
+                }}
+              />
+              Enable Two-Factor Authentication
+            </label>
+            <div>
+              <label style={{ display: 'block', marginBottom: '6px', fontSize: '13px', fontWeight: '500', color: '#4a4a4a' }}>
+                Session Timeout (minutes)
+              </label>
+              <input
+                type="number"
+                value={settings.security.sessionTimeout}
+                onChange={(e) => setSettings({
+                  ...settings,
+                  security: { ...settings.security, sessionTimeout: parseInt(e.target.value) }
+                })}
+                style={{
+                  width: '100%',
+                  padding: '10px 12px',
+                  border: '1px solid #e0e0e0',
+                  borderRadius: '4px',
+                  fontSize: '13px',
+                  outline: 'none',
+                  boxSizing: 'border-box',
+                  color: '#1a1a1a'
+                }}
+                onFocus={(e) => e.target.style.borderColor = '#1a1a1a'}
+                onBlur={(e) => e.target.style.borderColor = '#e0e0e0'}
+              />
+            </div>
+          </div>
+        </div>
+
         {/* Save Button */}
         <button
           onClick={handleSave}
           style={{
-            backgroundColor: '#2196f3',
+            backgroundColor: '#1a1a1a',
             color: 'white',
             border: 'none',
             padding: '12px 24px',
             borderRadius: '4px',
             cursor: 'pointer',
-            fontSize: '16px',
+            fontSize: '14px',
             fontWeight: '500',
             display: 'flex',
             alignItems: 'center',
             gap: '8px',
             justifyContent: 'center',
-            maxWidth: '200px'
+            maxWidth: '200px',
+            transition: 'background-color 0.2s'
           }}
+          onMouseEnter={(e) => e.target.style.backgroundColor = '#000'}
+          onMouseLeave={(e) => e.target.style.backgroundColor = '#1a1a1a'}
         >
-          <Save style={{ fontSize: '18px' }} />
+          <Save style={{ fontSize: '16px' }} />
           Save Settings
         </button>
       </div>

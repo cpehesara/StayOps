@@ -144,21 +144,21 @@ const GuestRegistration = () => {
 
   return (
     <div className="min-h-screen bg-white">
-      <div className="max-w-2xl mx-auto px-8 py-12">
+      <div className="max-w-7xl mx-auto px-8 py-12">
         {/* Header */}
-        <div className="mb-16">
-          <h1 className="text-5xl font-light tracking-tight text-black mb-3">
+        <div className="mb-16 border-b border-black pb-6">
+          <h1 className="text-5xl font-light tracking-tight text-black mb-2">
             Guest Registration
           </h1>
-          <p className="text-gray-500 text-sm">
-            Please fill in all required information
+          <p className="text-sm text-gray-500">
+            Register new guests to the system
           </p>
         </div>
 
         {/* Form */}
         <div className="border border-gray-200 p-8">
           {/* Name Fields */}
-          <div className="grid grid-cols-2 gap-6 mb-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
             <div>
               <label className="block text-xs text-gray-500 mb-2">
                 First Name *
@@ -207,7 +207,7 @@ const GuestRegistration = () => {
           </div>
 
           {/* Phone & Nationality */}
-          <div className="grid grid-cols-2 gap-6 mb-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
             <div>
               <label className="block text-xs text-gray-500 mb-2">
                 Phone Number *
@@ -240,7 +240,7 @@ const GuestRegistration = () => {
           </div>
 
           {/* Identity Type & Number */}
-          <div className="grid grid-cols-2 gap-6 mb-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
             <div>
               <label className="block text-xs text-gray-500 mb-2">
                 Identity Type *

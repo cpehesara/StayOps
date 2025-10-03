@@ -71,7 +71,7 @@ const QRScannerModal = ({ isOpen, onClose, onGuestScanned }) => {
 
       let lastScannedCode = '';
       let lastScanTime = 0;
-      const SCAN_COOLDOWN = 3000;
+      const SCAN_COOLDOWN = 2000;
 
       controlsRef.current = await codeReader.decodeFromVideoDevice(
         null,
@@ -89,7 +89,9 @@ const QRScannerModal = ({ isOpen, onClose, onGuestScanned }) => {
             lastScannedCode = qrValue;
             lastScanTime = currentTime;
             
-            fetchGuestData(qrValue.trim());
+            setTimeout(() => {
+              fetchGuestData(qrValue.trim());
+            }, 500);
           }
           if (err && !(err.name === 'NotFoundException')) {
             console.error('QR scan error:', err);
@@ -263,7 +265,6 @@ const QRScannerModal = ({ isOpen, onClose, onGuestScanned }) => {
 };
 
 const Reservations = () => {
-  const [currentTime, setCurrentTime] = useState(new Date());
   const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState('create');
   const [showScanner, setShowScanner] = useState(false);
@@ -300,11 +301,6 @@ const Reservations = () => {
   const [todayDepartures, setTodayDepartures] = useState([]);
   const [dailySummary, setDailySummary] = useState(null);
   const [roomStatusLoading, setRoomStatusLoading] = useState(false);
-
-  useEffect(() => {
-    const timer = setInterval(() => setCurrentTime(new Date()), 1000);
-    return () => clearInterval(timer);
-  }, []);
 
   useEffect(() => {
     if (activeTab === 'manage') {
@@ -651,24 +647,6 @@ const Reservations = () => {
     setShowScanner(true);
   };
 
-  const formatTime = (date) => {
-    return date.toLocaleTimeString('en-US', { 
-      hour12: false, 
-      hour: '2-digit', 
-      minute: '2-digit',
-      second: '2-digit'
-    });
-  };
-
-  const formatDate = (date) => {
-    return date.toLocaleDateString('en-US', { 
-      weekday: 'long',
-      year: 'numeric', 
-      month: 'long', 
-      day: 'numeric' 
-    });
-  };
-
   return (
     <div className="min-h-screen bg-white">
       <div className="max-w-7xl mx-auto px-8 py-12">
@@ -683,16 +661,13 @@ const Reservations = () => {
         />
 
         {/* Header */}
-        <div className="text-center mb-16 border-b border-black pb-6">
-          <h1 className="text-5xl font-light tracking-tight text-black mb-3">
+        <div className="mb-16 border-b border-black pb-6">
+          <h1 className="text-5xl font-light tracking-tight text-black mb-2">
             Reservations
           </h1>
-          <div className="text-xl font-light mb-2">
-            {formatTime(currentTime)}
-          </div>
-          <div className="text-sm text-gray-500">
-            {formatDate(currentTime)}
-          </div>
+          <p className="text-sm text-gray-500">
+            Manage bookings and check-ins
+          </p>
         </div>
 
         {/* Tabs */}

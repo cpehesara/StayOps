@@ -1,20 +1,20 @@
 import React, { useState, useEffect } from 'react';
+import { BrowserQRCodeReader } from '@zxing/browser';
 
-// QR Scanner Component - Your existing component
+// QR Scanner Component
 const QRScanner = ({ onGuestDataReceived, onClose }) => {
   const [result, setResult] = useState("");
   const [guestData, setGuestData] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [cameraError, setCameraError] = useState(null);
+  const [scanning, setScanning] = useState(false);
   const videoRef = React.useRef(null);
   const codeReaderRef = React.useRef(null);
   const controlsRef = React.useRef(null);
 
-  // API base URL
   const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || "http://localhost:8080";
 
-  // Fetch guest details from backend
   const fetchGuestData = async (guestId) => {
     try {
       setLoading(true);
@@ -37,7 +37,6 @@ const QRScanner = ({ onGuestDataReceived, onClose }) => {
       const data = await response.json();
       setGuestData(data);
       
-      // Pass guest data back to parent component
       if (onGuestDataReceived) {
         onGuestDataReceived(data);
       }
@@ -51,18 +50,20 @@ const QRScanner = ({ onGuestDataReceived, onClose }) => {
     }
   };
 
-  // Start camera and QR scanning
   const startCamera = async () => {
     try {
       setError(null);
       setCameraError(null);
       setGuestData(null);
       setResult("");
+      setScanning(true);
 
-      // Import BrowserQRCodeReader dynamically
-      const { BrowserQRCodeReader } = await import('@zxing/browser');
       const codeReader = new BrowserQRCodeReader();
       codeReaderRef.current = codeReader;
+
+      let lastScannedCode = '';
+      let lastScanTime = 0;
+      const SCAN_COOLDOWN = 2000;
 
       controlsRef.current = await codeReader.decodeFromVideoDevice(
         null,
@@ -70,9 +71,20 @@ const QRScanner = ({ onGuestDataReceived, onClose }) => {
         (res, err) => {
           if (res) {
             const qrValue = res.getText();
+            const currentTime = Date.now();
+            
+            if (qrValue === lastScannedCode && (currentTime - lastScanTime) < SCAN_COOLDOWN) {
+              return;
+            }
+            
             console.log("QR Detected:", qrValue);
             setResult(qrValue);
-            fetchGuestData(qrValue.trim());
+            lastScannedCode = qrValue;
+            lastScanTime = currentTime;
+            
+            setTimeout(() => {
+              fetchGuestData(qrValue.trim());
+            }, 500);
           }
           if (err && !(err.name === "NotFoundException")) {
             console.error("QR scan error:", err);
@@ -82,34 +94,27 @@ const QRScanner = ({ onGuestDataReceived, onClose }) => {
     } catch (err) {
       console.error("Camera error:", err);
       setCameraError("Unable to access camera. Please check permissions.");
+      setScanning(false);
     }
   };
 
-  // Stop camera when done
   const stopCamera = () => {
     if (controlsRef.current) {
       controlsRef.current.stop();
       controlsRef.current = null;
     }
+    setScanning(false);
   };
 
-  // Cleanup on unmount
   React.useEffect(() => {
     return () => stopCamera();
   }, []);
 
   return (
-    <div style={{ width: '100%', maxWidth: '500px' }}>
-      {/* Scanner Section */}
+    <div className="w-full max-w-lg">
       {!guestData && (
         <div>
-          <div style={{
-            border: "2px solid #000",
-            padding: "20px",
-            textAlign: "center",
-            marginBottom: "20px",
-            backgroundColor: '#fff'
-          }}>
+          <div className="border-2 border-black p-6 text-center mb-6 bg-white">
             {!result ? (
               <div>
                 <video
@@ -117,56 +122,29 @@ const QRScanner = ({ onGuestDataReceived, onClose }) => {
                   autoPlay
                   playsInline
                   muted
-                  style={{
-                    width: "100%",
-                    maxWidth: "300px",
-                    maxHeight: "300px",
-                    border: "2px solid #000",
-                    backgroundColor: '#f8f8f8'
-                  }}
+                  className="w-full max-w-sm max-h-80 border-2 border-black bg-gray-100 mb-4"
                 />
-                <div style={{ marginTop: "15px" }}>
+                <div className="flex gap-3 justify-center">
                   <button
                     onClick={startCamera}
-                    style={{
-                      backgroundColor: "#000",
-                      color: "#fff",
-                      border: "2px solid #000",
-                      padding: "12px 24px",
-                      cursor: "pointer",
-                      fontSize: "14px",
-                      fontWeight: '600',
-                      marginRight: "10px",
-                      textTransform: 'uppercase',
-                      letterSpacing: '0.5px'
-                    }}
+                    className="px-6 py-3 bg-black text-white text-sm font-semibold uppercase tracking-wide hover:bg-gray-900 transition-colors"
                   >
                     Start Camera
                   </button>
                   <button
                     onClick={stopCamera}
-                    style={{
-                      backgroundColor: "#fff",
-                      color: "#000",
-                      border: "2px solid #000",
-                      padding: "12px 24px",
-                      cursor: "pointer",
-                      fontSize: "14px",
-                      fontWeight: '600',
-                      textTransform: 'uppercase',
-                      letterSpacing: '0.5px'
-                    }}
+                    className="px-6 py-3 border-2 border-black bg-white text-black text-sm font-semibold uppercase tracking-wide hover:bg-gray-100 transition-colors"
                   >
                     Stop Camera
                   </button>
                 </div>
               </div>
             ) : (
-              <div style={{ padding: '20px' }}>
-                <div style={{ fontSize: '16px', fontWeight: '600', color: '#000', marginBottom: '8px' }}>
+              <div className="py-5">
+                <div className="text-base font-semibold text-black mb-2">
                   ✓ QR Code Detected
                 </div>
-                <div style={{ fontSize: '14px', fontFamily: 'monospace' }}>
+                <div className="text-sm font-mono">
                   {result}
                 </div>
               </div>
@@ -174,124 +152,63 @@ const QRScanner = ({ onGuestDataReceived, onClose }) => {
           </div>
 
           {cameraError && (
-            <div style={{ 
-              color: "#c62828", 
-              backgroundColor: '#ffebee', 
-              border: '2px solid #f44336',
-              padding: '12px',
-              marginBottom: '16px',
-              fontSize: '14px'
-            }}>
+            <div className="p-4 border-2 border-red-600 bg-red-50 mb-4 text-sm text-red-900">
               ⚠ {cameraError}
             </div>
           )}
           
           {error && (
-            <div style={{ 
-              color: "#c62828", 
-              backgroundColor: '#ffebee', 
-              border: '2px solid #f44336',
-              padding: '12px',
-              marginBottom: '16px',
-              fontSize: '14px'
-            }}>
+            <div className="p-4 border-2 border-red-600 bg-red-50 mb-4 text-sm text-red-900">
               ⚠ {error}
             </div>
           )}
           
           {loading && (
-            <div style={{ 
-              textAlign: 'center', 
-              padding: '20px',
-              fontSize: '16px',
-              fontWeight: '600'
-            }}>
+            <div className="text-center py-5 text-base font-semibold">
               Loading guest data...
             </div>
           )}
         </div>
       )}
 
-      {/* Guest Data Section */}
       {guestData && (
-        <div style={{
-          border: "2px solid #000",
-          padding: "20px",
-          backgroundColor: "#f8f8f8",
-          marginBottom: '20px'
-        }}>
-          <h3 style={{ 
-            marginBottom: "15px", 
-            fontSize: '18px',
-            fontWeight: '600',
-            textTransform: 'uppercase',
-            letterSpacing: '0.5px'
-          }}>
+        <div className="border-2 border-black p-6 bg-gray-50 mb-5">
+          <h3 className="mb-4 text-lg font-semibold uppercase tracking-wide">
             Guest Details Found
           </h3>
           
-          {/* Guest Images */}
           {(guestData.imageUrl || guestData.qrCodeBase64) && (
-            <div style={{ 
-              display: "flex", 
-              gap: "20px", 
-              marginBottom: "20px",
-              justifyContent: 'center'
-            }}>
+            <div className="flex gap-5 mb-5 justify-center">
               {guestData.imageUrl && (
-                <div style={{ textAlign: "center" }}>
+                <div className="text-center">
                   <img
                     src={guestData.imageUrl}
                     alt="Guest"
-                    style={{
-                      width: "100px",
-                      height: "100px",
-                      objectFit: "cover",
-                      border: "2px solid #000",
-                    }}
+                    className="w-24 h-24 object-cover border-2 border-black"
                   />
-                  <div style={{ marginTop: "8px", fontSize: '12px', fontWeight: '600' }}>
-                    Profile
-                  </div>
+                  <div className="mt-2 text-xs font-semibold">Profile</div>
                 </div>
               )}
 
               {guestData.qrCodeBase64 && (
-                <div style={{ textAlign: "center" }}>
+                <div className="text-center">
                   <img
                     src={guestData.qrCodeBase64}
                     alt="QR Code"
-                    style={{
-                      width: "100px",
-                      height: "100px",
-                      border: "2px solid #000",
-                    }}
+                    className="w-24 h-24 border-2 border-black"
                   />
-                  <div style={{ marginTop: "8px", fontSize: '12px', fontWeight: '600' }}>
-                    QR Code
-                  </div>
+                  <div className="mt-2 text-xs font-semibold">QR Code</div>
                 </div>
               )}
             </div>
           )}
 
-          {/* Guest Info */}
-          <div style={{ fontSize: '14px', lineHeight: '1.6' }}>
-            <div style={{ marginBottom: "8px" }}>
-              <strong>Name:</strong> {guestData.fullName}
-            </div>
-            <div style={{ marginBottom: "8px" }}>
-              <strong>Email:</strong> {guestData.email}
-            </div>
-            <div style={{ marginBottom: "8px" }}>
-              <strong>Phone:</strong> {guestData.phone}
-            </div>
-            <div style={{ marginBottom: "8px" }}>
-              <strong>Nationality:</strong> {guestData.nationality}
-            </div>
-            <div style={{ marginBottom: "8px" }}>
-              <strong>{guestData.identityType}:</strong> {guestData.identityNumber}
-            </div>
+          <div className="text-sm space-y-2">
+            <div><strong>Name:</strong> {guestData.fullName}</div>
+            <div><strong>Email:</strong> {guestData.email}</div>
+            <div><strong>Phone:</strong> {guestData.phone}</div>
+            <div><strong>Nationality:</strong> {guestData.nationality}</div>
+            <div><strong>{guestData.identityType}:</strong> {guestData.identityNumber}</div>
           </div>
 
           <button
@@ -299,19 +216,7 @@ const QRScanner = ({ onGuestDataReceived, onClose }) => {
               stopCamera();
               if (onClose) onClose();
             }}
-            style={{
-              width: '100%',
-              marginTop: '16px',
-              padding: '12px 24px',
-              fontSize: '14px',
-              fontWeight: '600',
-              border: '2px solid #000',
-              backgroundColor: '#000',
-              color: '#fff',
-              cursor: 'pointer',
-              textTransform: 'uppercase',
-              letterSpacing: '0.5px'
-            }}
+            className="w-full mt-4 px-6 py-3 text-sm font-semibold border-2 border-black bg-black text-white uppercase tracking-wide hover:bg-gray-900 transition-colors"
           >
             Use This Guest Data
           </button>
@@ -326,37 +231,9 @@ const QRScannerModal = ({ isOpen, onClose, onGuestDataReceived, title }) => {
   if (!isOpen) return null;
 
   return (
-    <div style={{
-      position: 'fixed',
-      top: 0,
-      left: 0,
-      right: 0,
-      bottom: 0,
-      backgroundColor: 'rgba(0, 0, 0, 0.9)',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      zIndex: 1000
-    }}>
-      <div style={{
-        backgroundColor: '#fff',
-        padding: '32px',
-        border: '3px solid #000',
-        maxWidth: '600px',
-        width: '90%',
-        maxHeight: '90vh',
-        overflow: 'auto',
-        textAlign: 'center',
-        position: 'relative'
-      }}>
-        <h3 style={{
-          fontSize: '20px',
-          fontWeight: '600',
-          marginBottom: '24px',
-          textTransform: 'uppercase',
-          letterSpacing: '0.5px',
-          margin: '0 0 24px 0'
-        }}>
+    <div className="fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center z-50">
+      <div className="bg-white p-8 border-4 border-black max-w-2xl w-11/12 max-h-screen overflow-auto text-center">
+        <h3 className="text-xl font-semibold mb-6 uppercase tracking-wide">
           {title}
         </h3>
         
@@ -367,18 +244,7 @@ const QRScannerModal = ({ isOpen, onClose, onGuestDataReceived, title }) => {
         
         <button
           onClick={onClose}
-          style={{
-            padding: '12px 24px',
-            fontSize: '14px',
-            fontWeight: '600',
-            border: '2px solid #000',
-            backgroundColor: '#fff',
-            color: '#000',
-            cursor: 'pointer',
-            textTransform: 'uppercase',
-            letterSpacing: '0.5px',
-            marginTop: '16px'
-          }}
+          className="px-6 py-3 text-sm font-semibold border-2 border-black bg-white text-black uppercase tracking-wide hover:bg-gray-100 transition-colors mt-4"
         >
           Cancel
         </button>
@@ -388,10 +254,9 @@ const QRScannerModal = ({ isOpen, onClose, onGuestDataReceived, title }) => {
 };
 
 const CheckInOut = () => {
-  const [currentTime, setCurrentTime] = useState(new Date());
   const [loading, setLoading] = useState(false);
   const [showQRScanner, setShowQRScanner] = useState(false);
-  const [scanningFor, setScanningFor] = useState(''); // 'guest' or 'reservation'
+  const [scanningFor, setScanningFor] = useState('');
   
   const [formData, setFormData] = useState({
     roomNumber: '',
@@ -402,13 +267,6 @@ const CheckInOut = () => {
 
   const [recentActivity, setRecentActivity] = useState([]);
 
-  // Update current time every second
-  useEffect(() => {
-    const timer = setInterval(() => setCurrentTime(new Date()), 1000);
-    return () => clearInterval(timer);
-  }, []);
-
-  // Load recent activity on component mount
   useEffect(() => {
     loadRecentActivity();
   }, []);
@@ -423,61 +281,16 @@ const CheckInOut = () => {
     }
   };
 
-  // QR Code scanning functions
   const handleQRScan = (guestData) => {
     if (guestData) {
-      // Populate form with guest data from QR scan
       setFormData({
         ...formData,
         guestName: guestData.fullName,
-        // You can also populate room number if available in guest data
-        // roomNumber: guestData.roomNumber || formData.roomNumber,
-        // reservationId: guestData.reservationId || formData.reservationId
       });
 
       alert(`Guest details loaded: ${guestData.fullName}`);
       setShowQRScanner(false);
       setScanningFor('');
-    }
-  };
-
-  const handleGuestQRScan = async (qrData) => {
-    // This is now handled by the QRScanner component itself
-    // The QRScanner will fetch guest data and call handleQRScan
-  };
-
-  const handleReservationQRScan = async (qrData) => {
-    try {
-      // Parse QR data for reservation
-      let reservationId;
-      
-      try {
-        const parsed = JSON.parse(qrData);
-        reservationId = parsed.reservationId || parsed.id;
-      } catch {
-        reservationId = qrData;
-      }
-
-      // Fetch reservation details from backend
-      const response = await fetch(`/api/reservation/${reservationId}`);
-      if (!response.ok) {
-        throw new Error('Reservation not found');
-      }
-
-      const reservationData = await response.json();
-      
-      // Populate form with reservation data
-      setFormData({
-        ...formData,
-        reservationId: reservationData.id,
-        guestName: reservationData.guestName,
-        roomNumber: reservationData.roomNumber || formData.roomNumber
-      });
-
-      alert(`Reservation details loaded: ${reservationData.id}`);
-    } catch (error) {
-      console.error('Failed to load reservation details:', error);
-      alert('Failed to load reservation details from QR code');
     }
   };
 
@@ -495,15 +308,13 @@ const CheckInOut = () => {
         guestName: actionData.guestName || null,
         reservationId: actionData.reservationId || null,
         timestamp: new Date().toISOString(),
-        staff: 'Current User' // Replace with actual user from auth
+        staff: 'Current User'
       };
 
       const response = await fetch(endpoint, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          // Add authorization header if needed
-          // 'Authorization': `Bearer ${authToken}`
         },
         body: JSON.stringify(payload)
       });
@@ -533,10 +344,8 @@ const CheckInOut = () => {
       const response = await stayOpsAPI.processAction(formData);
       
       if (response.success) {
-        // Reload recent activity to get updated data
         await loadRecentActivity();
         
-        // Reset form
         setFormData({
           roomNumber: '',
           guestName: '',
@@ -554,474 +363,204 @@ const CheckInOut = () => {
     setLoading(false);
   };
 
-  const formatTime = (date) => {
-    return date.toLocaleTimeString('en-US', { 
-      hour12: false, 
-      hour: '2-digit', 
-      minute: '2-digit',
-      second: '2-digit'
-    });
-  };
-
-  const formatDate = (date) => {
-    return date.toLocaleDateString('en-US', { 
-      weekday: 'short',
-      year: 'numeric', 
-      month: 'short', 
-      day: 'numeric' 
-    });
-  };
-
-  const getActionLabel = (action) => {
-    const labels = {
-      'guest-checkin': 'Check In',
-      'guest-checkout': 'Check Out',
-      'room-cleaning': 'Cleaning',
-      'room-maintenance': 'Maintenance'
-    };
-    return labels[action] || action;
-  };
-
   const getStatusIndicator = (status) => {
     return status === 'completed' ? '●' : '○';
   };
 
-  const baseInputStyle = {
-    width: '100%',
-    padding: '12px 16px',
-    fontSize: '16px',
-    border: '2px solid #000',
-    backgroundColor: '#fff',
-    color: '#000',
-    outline: 'none',
-    fontFamily: 'system-ui, -apple-system, sans-serif'
-  };
-
-  const buttonStyle = {
-    width: '100%',
-    padding: '16px 24px',
-    fontSize: '16px',
-    fontWeight: '600',
-    border: '2px solid #000',
-    backgroundColor: loading ? '#f8f8f8' : '#000',
-    color: loading ? '#999' : '#fff',
-    cursor: loading ? 'not-allowed' : 'pointer',
-    transition: 'all 0.15s ease',
-    fontFamily: 'system-ui, -apple-system, sans-serif',
-    textTransform: 'uppercase',
-    letterSpacing: '0.5px'
-  };
-
   return (
-    <div style={{ 
-      minHeight: '100vh', 
-      backgroundColor: '#fff', 
-      color: '#000', 
-      fontFamily: 'system-ui, -apple-system, sans-serif',
-      fontSize: '14px',
-      lineHeight: '1.4'
-    }}>
-      
-      <div style={{ 
-        maxWidth: '1200px', 
-        margin: '0 auto', 
-        padding: '24px',
-        display: 'grid',
-        gridTemplateColumns: '1fr 1fr',
-        gap: '32px'
-      }}>
-        
-        {/* Left Column - Operation Form */}
-        <div>
-          {/* Header */}
-          <div style={{ 
-            borderBottom: '3px solid #000', 
-            paddingBottom: '24px', 
-            marginBottom: '32px' 
-          }}>
-            <h1 style={{ 
-              fontSize: '28px', 
-              fontWeight: '700', 
-              margin: '0 0 16px 0',
-              textTransform: 'uppercase',
-              letterSpacing: '1px'
-            }}>
-              StayOps Terminal
-            </h1>
-            <div style={{ 
-              fontSize: '24px', 
-              fontWeight: '600', 
-              fontFamily: 'monospace',
-              marginBottom: '4px'
-            }}>
-              {formatTime(currentTime)}
+    <div className="min-h-screen bg-white text-black">
+      <div className="max-w-7xl mx-auto px-8 py-12">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+          
+          {/* Left Column - Operation Form */}
+          <div>
+            {/* Header */}
+            <div className="border-b-4 border-black pb-6 mb-12">
+              <h1 className="text-5xl font-light tracking-tight mb-3">
+                Check-In/Out
+              </h1>
+              <p className="text-sm text-gray-500">
+                Terminal Operations
+              </p>
             </div>
-            <div style={{ 
-              fontSize: '14px', 
-              color: '#666',
-              textTransform: 'uppercase',
-              letterSpacing: '0.5px'
-            }}>
-              {formatDate(currentTime)}
-            </div>
-          </div>
 
-          {/* Operation Selection */}
-          <div style={{ marginBottom: '32px' }}>
-            <label style={{ 
-              display: 'block', 
-              fontSize: '14px', 
-              fontWeight: '600', 
-              marginBottom: '16px',
-              textTransform: 'uppercase',
-              letterSpacing: '0.5px'
-            }}>
-              Operation Type
-            </label>
-            <div style={{ 
-              display: 'grid', 
-              gridTemplateColumns: '1fr 1fr', 
-              gap: '12px' 
-            }}>
-              {[
-                { value: 'guest-checkin', label: 'Check In' },
-                { value: 'guest-checkout', label: 'Check Out' },
-                { value: 'room-cleaning', label: 'Cleaning' },
-                { value: 'room-maintenance', label: 'Maintenance' }
-              ].map(option => (
-                <label key={option.value} style={{ 
-                  display: 'flex', 
-                  alignItems: 'center', 
-                  gap: '8px', 
-                  cursor: 'pointer',
-                  padding: '12px',
-                  border: '2px solid #000',
-                  backgroundColor: formData.action === option.value ? '#000' : '#fff',
-                  color: formData.action === option.value ? '#fff' : '#000',
-                  transition: 'all 0.15s ease'
-                }}>
-                  <input
-                    type="radio"
-                    name="action"
-                    value={option.value}
-                    checked={formData.action === option.value}
-                    onChange={(e) => setFormData({...formData, action: e.target.value})}
-                    style={{ display: 'none' }}
-                  />
-                  <span style={{ 
-                    fontSize: '14px', 
-                    fontWeight: '600',
-                    textTransform: 'uppercase',
-                    letterSpacing: '0.5px'
-                  }}>
-                    {option.label}
-                  </span>
-                </label>
-              ))}
-            </div>
-          </div>
-
-          {/* Form Fields */}
-          <div style={{ marginBottom: '32px' }}>
-            <div style={{ marginBottom: '24px' }}>
-              <label style={{ 
-                display: 'block', 
-                fontSize: '14px', 
-                fontWeight: '600', 
-                marginBottom: '8px',
-                textTransform: 'uppercase',
-                letterSpacing: '0.5px'
-              }}>
-                Room Number *
+            {/* Operation Selection */}
+            <div className="mb-12">
+              <label className="block text-xs text-gray-500 mb-4 uppercase tracking-wide">
+                Operation Type
               </label>
-              <input
-                type="text"
-                value={formData.roomNumber}
-                onChange={(e) => setFormData({...formData, roomNumber: e.target.value.toUpperCase()})}
-                style={{
-                  ...baseInputStyle,
-                  textAlign: 'center',
-                  fontSize: '20px',
-                  fontWeight: '600',
-                  fontFamily: 'monospace'
-                }}
-                placeholder="301"
-                maxLength="10"
-              />
+              <div className="grid grid-cols-2 gap-3">
+                {[
+                  { value: 'guest-checkin', label: 'Check In' },
+                  { value: 'guest-checkout', label: 'Check Out' },
+                  { value: 'room-cleaning', label: 'Cleaning' },
+                  { value: 'room-maintenance', label: 'Maintenance' }
+                ].map(option => (
+                  <label 
+                    key={option.value}
+                    className={`flex items-center justify-center gap-2 cursor-pointer px-4 py-3 border-2 border-black transition-colors ${
+                      formData.action === option.value 
+                        ? 'bg-black text-white' 
+                        : 'bg-white text-black hover:bg-gray-50'
+                    }`}
+                  >
+                    <input
+                      type="radio"
+                      name="action"
+                      value={option.value}
+                      checked={formData.action === option.value}
+                      onChange={(e) => setFormData({...formData, action: e.target.value})}
+                      className="hidden"
+                    />
+                    <span className="text-sm font-semibold uppercase tracking-wide">
+                      {option.label}
+                    </span>
+                  </label>
+                ))}
+              </div>
             </div>
 
-            {formData.action.includes('guest') && (
-              <>
-                <div style={{ marginBottom: '24px' }}>
-                  <label style={{ 
-                    display: 'block', 
-                    fontSize: '14px', 
-                    fontWeight: '600', 
-                    marginBottom: '8px',
-                    textTransform: 'uppercase',
-                    letterSpacing: '0.5px'
-                  }}>
-                    Guest Name *
-                  </label>
-                  <div style={{ display: 'flex', gap: '8px' }}>
-                    <input
-                      type="text"
-                      value={formData.guestName}
-                      onChange={(e) => setFormData({...formData, guestName: e.target.value})}
-                      style={{ ...baseInputStyle, flex: 1 }}
-                      placeholder="John Smith"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => startQRScan('guest')}
-                      style={{
-                        padding: '12px 16px',
-                        fontSize: '14px',
-                        fontWeight: '600',
-                        border: '2px solid #000',
-                        backgroundColor: '#fff',
-                        color: '#000',
-                        cursor: 'pointer',
-                        transition: 'all 0.15s ease',
-                        textTransform: 'uppercase',
-                        letterSpacing: '0.5px',
-                        minWidth: '100px'
-                      }}
-                      onMouseOver={(e) => {
-                        e.target.style.backgroundColor = '#000';
-                        e.target.style.color = '#fff';
-                      }}
-                      onMouseOut={(e) => {
-                        e.target.style.backgroundColor = '#fff';
-                        e.target.style.color = '#000';
-                      }}
-                    >
-                      Scan Guest
-                    </button>
-                  </div>
-                </div>
+            {/* Form Fields */}
+            <div className="mb-12">
+              <div className="mb-6">
+                <label className="block text-xs text-gray-500 mb-2 uppercase tracking-wide">
+                  Room Number *
+                </label>
+                <input
+                  type="text"
+                  value={formData.roomNumber}
+                  onChange={(e) => setFormData({...formData, roomNumber: e.target.value.toUpperCase()})}
+                  className="w-full px-4 py-4 border-2 border-black bg-white text-black text-center text-2xl font-semibold font-mono focus:outline-none focus:border-gray-600"
+                  placeholder="301"
+                  maxLength="10"
+                />
+              </div>
 
-                <div style={{ marginBottom: '24px' }}>
-                  <label style={{ 
-                    display: 'block', 
-                    fontSize: '14px', 
-                    fontWeight: '600', 
-                    marginBottom: '8px',
-                    textTransform: 'uppercase',
-                    letterSpacing: '0.5px'
-                  }}>
-                    Reservation ID
-                  </label>
-                  <div style={{ display: 'flex', gap: '8px' }}>
+              {formData.action.includes('guest') && (
+                <>
+                  <div className="mb-6">
+                    <label className="block text-xs text-gray-500 mb-2 uppercase tracking-wide">
+                      Guest Name *
+                    </label>
+                    <div className="flex gap-2">
+                      <input
+                        type="text"
+                        value={formData.guestName}
+                        onChange={(e) => setFormData({...formData, guestName: e.target.value})}
+                        className="flex-1 px-4 py-3 border-2 border-black bg-white text-black text-sm focus:outline-none focus:border-gray-600"
+                        placeholder="John Smith"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => startQRScan('guest')}
+                        className="px-6 py-3 text-sm font-semibold border-2 border-black bg-white text-black uppercase tracking-wide hover:bg-black hover:text-white transition-colors"
+                      >
+                        Scan
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="mb-6">
+                    <label className="block text-xs text-gray-500 mb-2 uppercase tracking-wide">
+                      Reservation ID
+                    </label>
                     <input
                       type="text"
                       value={formData.reservationId}
                       onChange={(e) => setFormData({...formData, reservationId: e.target.value.toUpperCase()})}
-                      style={{
-                        ...baseInputStyle,
-                        fontFamily: 'monospace',
-                        flex: 1
-                      }}
+                      className="w-full px-4 py-3 border-2 border-black bg-white text-black font-mono text-sm focus:outline-none focus:border-gray-600"
                       placeholder="RES001"
                     />
-                    <button
-                      type="button"
-                      onClick={() => startQRScan('reservation')}
-                      style={{
-                        padding: '12px 16px',
-                        fontSize: '14px',
-                        fontWeight: '600',
-                        border: '2px solid #000',
-                        backgroundColor: '#fff',
-                        color: '#000',
-                        cursor: 'pointer',
-                        transition: 'all 0.15s ease',
-                        textTransform: 'uppercase',
-                        letterSpacing: '0.5px',
-                        minWidth: '100px'
-                      }}
-                      onMouseOver={(e) => {
-                        e.target.style.backgroundColor = '#000';
-                        e.target.style.color = '#fff';
-                      }}
-                      onMouseOut={(e) => {
-                        e.target.style.backgroundColor = '#fff';
-                        e.target.style.color = '#000';
-                      }}
-                    >
-                      Scan Res
-                    </button>
                   </div>
-                </div>
-              </>
-            )}
-          </div>
-
-          {/* Submit Button */}
-          <button
-            onClick={handleSubmit}
-            disabled={loading}
-            style={buttonStyle}
-            onMouseOver={(e) => {
-              if (!loading) {
-                e.target.style.backgroundColor = '#333';
-              }
-            }}
-            onMouseOut={(e) => {
-              if (!loading) {
-                e.target.style.backgroundColor = '#000';
-              }
-            }}
-          >
-            {loading ? 'Processing...' : 'Execute Operation'}
-          </button>
-        </div>
-
-        {/* Right Column - Activity Log */}
-        <div>
-          <div style={{ 
-            borderBottom: '3px solid #000', 
-            paddingBottom: '16px', 
-            marginBottom: '24px' 
-          }}>
-            <h2 style={{ 
-              fontSize: '20px', 
-              fontWeight: '600', 
-              margin: '0',
-              textTransform: 'uppercase',
-              letterSpacing: '0.5px'
-            }}>
-              Activity Log
-            </h2>
-          </div>
-
-          <div style={{ 
-            maxHeight: '600px', 
-            overflowY: 'auto',
-            border: '2px solid #000'
-          }}>
-            {recentActivity.length === 0 ? (
-              <div style={{ 
-                padding: '32px', 
-                textAlign: 'center', 
-                color: '#666',
-                fontStyle: 'italic'
-              }}>
-                No recent activity
-              </div>
-            ) : (
-              recentActivity.map((activity, index) => (
-                <div 
-                  key={activity.id} 
-                  style={{ 
-                    padding: '16px',
-                    borderBottom: index < recentActivity.length - 1 ? '1px solid #e0e0e0' : 'none',
-                    backgroundColor: index % 2 === 0 ? '#fff' : '#f8f8f8'
-                  }}
-                >
-                  <div style={{ 
-                    display: 'flex', 
-                    justifyContent: 'space-between', 
-                    alignItems: 'flex-start',
-                    marginBottom: '8px'
-                  }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                      <span style={{ 
-                        fontSize: '12px', 
-                        color: activity.status === 'completed' ? '#000' : '#666'
-                      }}>
-                        {getStatusIndicator(activity.status)}
-                      </span>
-                      <span style={{ 
-                        fontWeight: '600', 
-                        fontSize: '14px',
-                        textTransform: 'uppercase',
-                        letterSpacing: '0.5px'
-                      }}>
-                        {activity.type}
-                      </span>
-                    </div>
-                    <span style={{ 
-                      fontSize: '12px', 
-                      fontFamily: 'monospace',
-                      color: '#666'
-                    }}>
-                      {activity.time}
-                    </span>
-                  </div>
-                  
-                  <div style={{ fontSize: '13px', color: '#333' }}>
-                    <div style={{ marginBottom: '2px' }}>
-                      <strong>Room:</strong> {activity.room}
-                    </div>
-                    {activity.guest && (
-                      <div style={{ marginBottom: '2px' }}>
-                        <strong>Guest:</strong> {activity.guest}
-                      </div>
-                    )}
-                    {activity.staff && (
-                      <div style={{ marginBottom: '2px' }}>
-                        <strong>Staff:</strong> {activity.staff}
-                      </div>
-                    )}
-                    <div style={{ 
-                      fontSize: '12px',
-                      color: activity.status === 'completed' ? '#000' : '#666',
-                      fontWeight: '600',
-                      textTransform: 'uppercase',
-                      letterSpacing: '0.5px'
-                    }}>
-                      {activity.status}
-                    </div>
-                  </div>
-                </div>
-              ))
-            )}
-          </div>
-
-          {/* API Documentation */}
-          <div style={{ 
-            marginTop: '32px',
-            border: '2px solid #000',
-            backgroundColor: '#f8f8f8'
-          }}>
-            <div style={{ 
-              padding: '16px',
-              borderBottom: '1px solid #000',
-              backgroundColor: '#000',
-              color: '#fff'
-            }}>
-              <h3 style={{ 
-                fontSize: '14px',
-                fontWeight: '600', 
-                margin: '0',
-                textTransform: 'uppercase',
-                letterSpacing: '0.5px'
-              }}>
-                API Endpoints
-              </h3>
+                </>
+              )}
             </div>
-            <div style={{ padding: '16px' }}>
-              <div style={{ fontSize: '12px', fontFamily: 'monospace', lineHeight: '1.6' }}>
-                <div style={{ marginBottom: '8px' }}>
-                  <strong>POST</strong> /api/guest/checkin
+
+            {/* Submit Button */}
+            <button
+              onClick={handleSubmit}
+              disabled={loading}
+              className={`w-full px-6 py-4 text-sm font-semibold uppercase tracking-wide transition-colors ${
+                loading
+                  ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                  : 'bg-black text-white hover:bg-gray-900'
+              }`}
+            >
+              {loading ? 'Processing...' : 'Execute Operation'}
+            </button>
+          </div>
+
+          {/* Right Column - Activity Log */}
+          <div>
+            <div className="border-b-4 border-black pb-4 mb-6">
+              <h2 className="text-2xl font-light tracking-tight">
+                Activity Log
+              </h2>
+            </div>
+
+            <div className="border-2 border-black max-h-96 overflow-y-auto">
+              {recentActivity.length === 0 ? (
+                <div className="p-12 text-center text-gray-400 italic text-sm">
+                  No recent activity
                 </div>
-                <div style={{ marginBottom: '8px' }}>
-                  <strong>POST</strong> /api/guest/checkout
-                </div>
-                <div style={{ marginBottom: '8px' }}>
-                  <strong>POST</strong> /api/room/cleaning
-                </div>
-                <div style={{ marginBottom: '16px' }}>
-                  <strong>POST</strong> /api/room/maintenance
-                </div>
-                
-                <div style={{ 
-                  backgroundColor: '#fff', 
-                  border: '1px solid #ccc',
-                  padding: '12px',
-                  fontSize: '11px'
-                }}>
+              ) : (
+                recentActivity.map((activity, index) => (
+                  <div 
+                    key={activity.id} 
+                    className={`p-4 ${
+                      index < recentActivity.length - 1 ? 'border-b border-gray-200' : ''
+                    } ${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}`}
+                  >
+                    <div className="flex justify-between items-start mb-2">
+                      <div className="flex items-center gap-2">
+                        <span className={`text-xs ${
+                          activity.status === 'completed' ? 'text-black' : 'text-gray-400'
+                        }`}>
+                          {getStatusIndicator(activity.status)}
+                        </span>
+                        <span className="font-semibold text-sm uppercase tracking-wide">
+                          {activity.type}
+                        </span>
+                      </div>
+                      <span className="text-xs font-mono text-gray-500">
+                        {activity.time}
+                      </span>
+                    </div>
+                    
+                    <div className="text-sm text-gray-700 space-y-1">
+                      <div><strong>Room:</strong> {activity.room}</div>
+                      {activity.guest && (
+                        <div><strong>Guest:</strong> {activity.guest}</div>
+                      )}
+                      {activity.staff && (
+                        <div><strong>Staff:</strong> {activity.staff}</div>
+                      )}
+                      <div className={`text-xs font-semibold uppercase tracking-wide ${
+                        activity.status === 'completed' ? 'text-black' : 'text-gray-500'
+                      }`}>
+                        {activity.status}
+                      </div>
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+
+            {/* API Documentation */}
+            <div className="mt-12 border-2 border-black bg-gray-50">
+              <div className="p-4 border-b border-black bg-black text-white">
+                <h3 className="text-sm font-semibold uppercase tracking-wide">
+                  API Endpoints
+                </h3>
+              </div>
+              <div className="p-4">
+                <div className="text-xs font-mono leading-relaxed space-y-2">
+                  <div><strong>POST</strong> /api/guest/checkin</div>
+                  <div><strong>POST</strong> /api/guest/checkout</div>
+                  <div><strong>POST</strong> /api/room/cleaning</div>
+                  <div><strong>POST</strong> /api/room/maintenance</div>
+                  
+                  <div className="bg-white border border-gray-300 p-3 mt-4 text-xs">
 {`{
   "roomNumber": "301",
   "guestName": "John Smith",
@@ -1029,6 +568,7 @@ const CheckInOut = () => {
   "timestamp": "2025-09-25T14:30:00Z",
   "staff": "Current User"
 }`}
+                  </div>
                 </div>
               </div>
             </div>
