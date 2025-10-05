@@ -1,0 +1,54 @@
+Folder PATH listing for volume New Volume
+Volume serial number is C422-C9D8
+D:.
+¦   AllCodeFiles.txt
+¦   AllJSXFiles.txt
+¦   App.css
+¦   App.jsx
+¦   index.css
+¦   index.js
+¦   main.jsx
+¦   ProjectStructure.txt
+¦   reportWebVitals.js
+¦   setupTests.js
+¦   
++---api
+¦       automation.js
+¦       guest.js
+¦       metrics.js
+¦       reception.js
+¦       reservation.js
+¦       room.js
+¦       service.js
+¦       
++---components
+¦       AutomationMetricsWidget.jsx
+¦       DashboardLayout.jsx
+¦       Login.css
+¦       Login.jsx
+¦       ProtectedRoute.jsx
+¦       QRScanner.jsx
+¦       ReservationCalendar.jsx
+¦       SideBar.jsx
+¦       
++---pages
+        AnalyticsAutomation.jsx
+        AutomationDashboard.jsx
+        Billing.jsx
+        CheckInOut.jsx
+        Communication.jsx
+        DynamicPricing.jsx
+        FraudDetection.jsx
+        GuestRegistrationForm.jsx
+        GuestRequests.jsx
+        Guests.jsx
+        HousekeepingTasks.jsx
+        OTAChannelManagement.jsx
+        PaymentAutomation.jsx
+        ReceptionistDashboard.jsx
+        Reporting.jsx
+        Reservations.jsx
+        RoomView.jsx
+        Security.jsx
+        Settings.jsx
+        
