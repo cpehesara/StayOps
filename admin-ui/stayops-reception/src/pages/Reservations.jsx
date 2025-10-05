@@ -17,7 +17,7 @@ import { getAllRooms } from '../api/room';
 
 const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8080';
 
-// QR Scanner Modal
+// QR Scanner Modal Component
 const QRScannerModal = ({ isOpen, onClose, onGuestScanned }) => {
   const [result, setResult] = useState('');
   const [guestData, setGuestData] = useState(null);
@@ -232,7 +232,7 @@ const QRScannerModal = ({ isOpen, onClose, onGuestScanned }) => {
 
             <div className="space-y-3 text-sm mb-6">
               <div className="p-3 border border-gray-200">
-                <span className="font-medium">Guest ID:</span> {guestData.id}
+                <span className="font-medium">Guest ID:</span> {guestData.guestId}
               </div>
               <div className="p-3 border border-gray-200">
                 <span className="font-medium">Name:</span> {guestData.fullName}
@@ -347,7 +347,7 @@ const Reservations = () => {
       }
       
       const trulyAvailableRooms = allRooms.filter(room => {
-        const roomId = room.roomId || room.id;
+        const roomId = room.id;
         return !unavailableRoomIds.has(roomId);
       });
       
@@ -355,7 +355,7 @@ const Reservations = () => {
       const uniqueTypes = new Set();
       
       trulyAvailableRooms.forEach(room => {
-        const roomType = room.roomType || room.type || 'Standard';
+        const roomType = room.type || 'Standard';
         uniqueTypes.add(roomType);
         
         if (!roomsByType[roomType]) {
@@ -382,10 +382,9 @@ const Reservations = () => {
       const roomsOfType = availableRoomsByType[reservationData.roomType];
       if (roomsOfType.length > 0) {
         const firstRoom = roomsOfType[0];
-        const roomId = firstRoom.roomId || firstRoom.id;
         setReservationData(prev => ({ 
           ...prev, 
-          roomId: roomId.toString() 
+          roomId: firstRoom.id.toString() 
         }));
       }
     }
@@ -429,25 +428,19 @@ const Reservations = () => {
 
     const checkIn = new Date(data.checkInDate);
     const checkOut = new Date(data.checkOutDate);
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-
-    if (checkIn < today) {
-      alert('Check-in date cannot be in the past');
-      return;
-    }
 
     if (checkOut <= checkIn) {
       alert('Check-out date must be after check-in date');
       return;
     }
 
+    // Build reservation payload according to backend ReservationRequestDTO
     const reservationPayload = {
       guestId: data.guestId,
+      roomIds: [parseInt(data.roomId)],
       checkInDate: data.checkInDate,
       checkOutDate: data.checkOutDate,
       status: data.status,
-      roomIds: [parseInt(data.roomId)],
       adults: data.adults,
       kids: data.kids,
       mealPlan: data.mealPlan,
@@ -459,39 +452,33 @@ const Reservations = () => {
     try {
       setLoading(true);
       
-      try {
-        const response = await fetch(`${API_BASE_URL}/api/v1/guests/${data.guestId}`, {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-            Accept: 'application/json',
-          },
-        });
-        
-        if (!response.ok) {
-          throw new Error(`Guest not found (${response.status}). Please scan a valid guest QR code.`);
-        }
-        
-        await response.json();
-      } catch (guestError) {
-        throw new Error(`Guest verification failed: ${guestError.message}`);
-      }
-
-      const selectedRoomId = parseInt(reservationPayload.roomIds[0]);
-      const roomsOfType = availableRoomsByType[data.roomType] || [];
-      const roomExists = roomsOfType.find(room => {
-        const roomId = room.roomId || room.id;
-        return roomId === selectedRoomId;
+      // Verify guest exists
+      const guestResponse = await fetch(`${API_BASE_URL}/api/v1/guests/${data.guestId}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          Accept: 'application/json',
+        },
       });
       
+      if (!guestResponse.ok) {
+        throw new Error(`Guest not found. Please scan a valid guest QR code.`);
+      }
+
+      // Verify room availability
+      const selectedRoomId = parseInt(reservationPayload.roomIds[0]);
+      const roomsOfType = availableRoomsByType[data.roomType] || [];
+      const roomExists = roomsOfType.find(room => room.id === selectedRoomId);
+      
       if (!roomExists) {
-        throw new Error(`Room validation failed: Room ID ${selectedRoomId} is not available for the selected dates.`);
+        throw new Error(`Room validation failed: Room is not available for the selected dates.`);
       }
 
       const newReservation = await createReservationAPI(reservationPayload);
       
       alert(`Reservation created successfully!\n\nReservation ID: ${newReservation.reservationId}\nGuest: ${data.guestName}\nRoom Type: ${data.roomType}\nRoom Number: ${roomExists.roomNumber}`);
       
+      // Reset form
       setReservationData({
         guestId: '',
         guestName: '',
@@ -607,14 +594,14 @@ const Reservations = () => {
   };
 
   const handleGuestScanned = async (guestData) => {
-    const guestId = guestData.id || guestData.guestId || guestData.guest_id || '';
+    const guestId = guestData.guestId || guestData.id;
     
     if (scannerTarget === 'create') {
       const newGuestData = {
         guestId: guestId,
-        guestName: guestData.fullName || guestData.name || guestData.guestName || '',
-        guestEmail: guestData.email || guestData.emailAddress || '',
-        guestPhone: guestData.phone || guestData.phoneNumber || guestData.mobile || ''
+        guestName: guestData.fullName || guestData.name,
+        guestEmail: guestData.email,
+        guestPhone: guestData.phone
       };
       
       setReservationData(prevData => ({
@@ -789,7 +776,7 @@ const Reservations = () => {
                     const roomsOfType = availableRoomsByType[type] || [];
                     const count = roomsOfType.length;
                     const sampleRoom = roomsOfType[0];
-                    const price = sampleRoom?.pricePerNight || sampleRoom?.price || 0;
+                    const price = sampleRoom?.pricePerNight || 0;
                     
                     return (
                       <option key={type} value={type}>

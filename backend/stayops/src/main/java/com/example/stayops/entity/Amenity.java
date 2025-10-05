@@ -1,6 +1,6 @@
 package com.example.stayops.entity;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -13,6 +13,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Amenity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -22,6 +23,7 @@ public class Amenity {
     private String name;
 
     @ManyToMany(mappedBy = "amenities")
-    @JsonBackReference
+    @JsonIgnoreProperties({"amenities", "staffMembers", "rooms", "departments"})
+    @Builder.Default
     private List<Hotel> hotels = new ArrayList<>();
 }

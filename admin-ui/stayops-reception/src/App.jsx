@@ -18,6 +18,13 @@ import Security from './pages/Security.jsx';
 import Settings from './pages/Settings.jsx';
 import QRScanner from './components/QRScanner.jsx';
 
+// Automation Pages
+import AutomationDashboard from './pages/AutomationDashboard.jsx';
+import DynamicPricing from './pages/DynamicPricing.jsx';
+import FraudDetection from './pages/FraudDetection.jsx';
+import HousekeepingTasks from './pages/HousekeepingTasks.jsx';
+import OTAChannelManagement from './pages/OTAChannelManagement.jsx';
+
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -78,6 +85,7 @@ function App() {
           </ProtectedRoute>
         }
       >
+        {/* Core Receptionist Pages */}
         <Route path="overview" element={<ReceptionistDashboard />} />
         <Route path="check-in-out" element={<CheckInOut />} />
         <Route path="reservations" element={<Reservations />} />
@@ -91,6 +99,15 @@ function App() {
         <Route path="security" element={<Security />} />
         <Route path="qr-scanner" element={<QRScanner />} />
         <Route path="settings" element={<Settings />} />
+        
+        {/* Automation Pages */}
+        <Route path="automation" element={<AutomationDashboard />} />
+        <Route path="automation/pricing" element={<DynamicPricing />} />
+        <Route path="automation/fraud" element={<FraudDetection />} />
+        <Route path="automation/housekeeping" element={<HousekeepingTasks />} />
+        <Route path="automation/ota" element={<OTAChannelManagement />} />
+        
+        {/* Default redirect */}
         <Route index element={<Navigate to="overview" replace />} />
       </Route>
       

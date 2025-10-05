@@ -2,7 +2,7 @@ package com.example.stayops.entity;
 
 import com.example.stayops.enums.StaffRole;
 import com.example.stayops.enums.StaffStatus;
-import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -20,11 +20,12 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler", "hotel", "department"})
 public class Staff {
 
     @Id
     @Column(name = "staff_id", nullable = false, unique = true, length = 50)
-    private String staffId;   // String-based ID (e.g., ST-001)
+    private String staffId;
 
     @NotBlank(message = "Name is required")
     @Size(max = 100, message = "Name cannot exceed 100 characters")
@@ -53,12 +54,12 @@ public class Staff {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "hotel_id", nullable = false)
-    @JsonBackReference
+    @JsonIgnoreProperties({"staffMembers", "rooms", "departments", "amenities"})
     private Hotel hotel;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "department_id", nullable = false)
-    @JsonBackReference
+    @JsonIgnoreProperties({"staff", "hotel"})
     private Department department;
 
     @CreationTimestamp

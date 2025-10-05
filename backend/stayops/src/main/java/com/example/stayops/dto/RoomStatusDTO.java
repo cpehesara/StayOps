@@ -1,4 +1,3 @@
-// RoomStatusDTO.java
 package com.example.stayops.dto;
 
 import lombok.AllArgsConstructor;
@@ -17,11 +16,11 @@ public class RoomStatusDTO {
     private String roomNumber;
     private String roomType;
     private LocalDate date;
-    private String status; // AVAILABLE, OCCUPIED, RESERVED, DEPARTING, ARRIVING, MAINTENANCE
+    private String status; // AVAILABLE, OCCUPIED, RESERVED, ARRIVING, DEPARTING, DIRTY, OUT_OF_SERVICE
     private Long reservationId;
+    private String reservationStatus;
     private String guestId;
     private String guestName;
     private LocalDate checkInDate;
     private LocalDate checkOutDate;
-    private String reservationStatus;
 }

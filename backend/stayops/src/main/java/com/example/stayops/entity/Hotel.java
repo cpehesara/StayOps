@@ -1,5 +1,6 @@
 package com.example.stayops.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
@@ -19,6 +20,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Hotel {
 
     @Id
@@ -44,14 +46,15 @@ public class Hotel {
     private String description;
 
     @OneToMany(mappedBy = "hotel", cascade = CascadeType.ALL)
+    @JsonIgnoreProperties({"hotel", "department"})
     private List<Staff> staffMembers = new ArrayList<>();
 
     @OneToMany(mappedBy = "hotel", cascade = CascadeType.ALL)
-    @JsonManagedReference
+    @JsonIgnoreProperties({"hotel", "reservations"})
     private List<Room> rooms = new ArrayList<>();
 
     @OneToMany(mappedBy = "hotel", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonManagedReference
+    @JsonIgnoreProperties({"hotel", "staff"})  // CRITICAL: Ignore staff to prevent deep lazy loading
     private List<Department> departments = new ArrayList<>();
 
     @ManyToMany
@@ -60,6 +63,6 @@ public class Hotel {
             joinColumns = @JoinColumn(name = "hotel_id"),
             inverseJoinColumns = @JoinColumn(name = "amenity_id")
     )
-    @JsonManagedReference
+    @JsonIgnoreProperties("hotels")
     private List<Amenity> amenities = new ArrayList<>();
 }

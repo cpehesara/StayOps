@@ -1,53 +1,63 @@
 package com.example.stayops.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 @Entity
 @Table(name = "service_requests")
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
 @Builder
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class ServiceRequest {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long requestId;
+    private Long id;
 
-    @ManyToOne
-    @JoinColumn(name = "reservation_id", nullable = false)
-    private Reservation reservation;
-
-    @ManyToOne
-    @JoinColumn(name = "guest_id", nullable = false)
-    private Guest guest;
-
-    @ManyToOne
-    @JoinColumn(name = "room_id", nullable = false)
-    private Room room;
-
-    @ManyToOne
-    @JoinColumn(name = "service_type_id", nullable = false)
-    private ServiceType serviceType;
-
-    @Column(nullable = false)
-    private String assignedTo; // Staff or department
+    @Column(nullable = false, length = 100)
+    private String serviceType;
 
     @Column(length = 500)
     private String description;
 
+    @Column(nullable = false, length = 20)
+    @Builder.Default
+    private String status = "PENDING";
+
+    @Column(length = 100)
+    private String requestedBy;
+
+    @Column(length = 20)
+    private String priority;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "reservation_id")
+    @JsonIgnoreProperties({"guest", "rooms", "reservationDetails", "history"})
+    private Reservation reservation;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "room_id")
+    @JsonIgnoreProperties({"reservations", "hotel"})
+    private Room room;
+
+    @Column(length = 100)
+    private String assignedTo;
+
+    private Instant completedAt;
+
+    @Column(length = 500)
+    private String notes;
+
     @CreationTimestamp
-    private LocalDateTime requestAt;
+    private Instant createdAt;
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private RequestStatus status;
-
-    public enum RequestStatus {
-        PENDING, IN_PROGRESS, COMPLETED, CANCELLED
-    }
+    @UpdateTimestamp
+    private Instant updatedAt;
 }

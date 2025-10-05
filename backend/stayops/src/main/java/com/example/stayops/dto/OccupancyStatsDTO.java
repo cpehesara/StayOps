@@ -1,4 +1,3 @@
-// OccupancyStatsDTO.java
 package com.example.stayops.dto;
 
 import lombok.AllArgsConstructor;

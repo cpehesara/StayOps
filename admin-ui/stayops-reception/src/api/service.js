@@ -2,38 +2,26 @@
 
 const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || "http://localhost:8080";
 
-// Standard headers without authentication
 const getHeaders = () => ({
   'Content-Type': 'application/json',
   'Accept': 'application/json',
 });
 
-// ✅ Create new service request
+// ==================== SERVICE REQUEST CRUD ====================
+
 export const createServiceRequest = async (serviceRequestData) => {
   try {
     console.log('Creating service request:', serviceRequestData);
     
-    const response = await fetch(`${API_BASE_URL}/api/v1/service-requests`, {
+    const response = await fetch(`${API_BASE_URL}/api/service-requests/create`, {
       method: "POST",
       headers: getHeaders(),
       body: JSON.stringify(serviceRequestData),
     });
-    
-    console.log('Service request creation response status:', response.status);
-    console.log('Service request creation response headers:', [...response.headers.entries()]);
 
     if (!response.ok) {
       const errorText = await response.text();
       console.error('Backend error response:', errorText);
-      
-      let parsedError;
-      try {
-        parsedError = JSON.parse(errorText);
-        console.error('Parsed backend error:', parsedError);
-      } catch (parseError) {
-        console.error('Could not parse error response as JSON:', parseError);
-      }
-      
       throw new Error(`Failed to create service request: ${response.status} - ${errorText}`);
     }
 
@@ -42,22 +30,15 @@ export const createServiceRequest = async (serviceRequestData) => {
     return data;
   } catch (error) {
     console.error('Error creating service request:', error);
-    console.error('Error details:', {
-      name: error.name,
-      message: error.message,
-      stack: error.stack,
-      serviceRequestData: serviceRequestData
-    });
     throw error;
   }
 };
 
-// ✅ Update service request
 export const updateServiceRequest = async (id, serviceRequestData) => {
   try {
     console.log(`Updating service request ${id}:`, serviceRequestData);
     
-    const response = await fetch(`${API_BASE_URL}/api/v1/service-requests/${id}`, {
+    const response = await fetch(`${API_BASE_URL}/api/service-requests/${id}`, {
       method: "PUT",
       headers: getHeaders(),
       body: JSON.stringify(serviceRequestData),
@@ -77,12 +58,11 @@ export const updateServiceRequest = async (id, serviceRequestData) => {
   }
 };
 
-// ✅ Get service request by ID
 export const getServiceRequestById = async (id) => {
   try {
     console.log(`Fetching service request ${id}`);
     
-    const response = await fetch(`${API_BASE_URL}/api/v1/service-requests/${id}`, {
+    const response = await fetch(`${API_BASE_URL}/api/service-requests/${id}`, {
       method: "GET",
       headers: getHeaders(),
     });
@@ -100,12 +80,11 @@ export const getServiceRequestById = async (id) => {
   }
 };
 
-// ✅ Get all service requests
 export const getAllServiceRequests = async () => {
   try {
     console.log('Fetching all service requests');
     
-    const response = await fetch(`${API_BASE_URL}/api/v1/service-requests`, {
+    const response = await fetch(`${API_BASE_URL}/api/service-requests/all`, {
       method: "GET",
       headers: getHeaders(),
     });
@@ -123,12 +102,11 @@ export const getAllServiceRequests = async () => {
   }
 };
 
-// ✅ Delete service request
 export const deleteServiceRequest = async (id) => {
   try {
     console.log(`Deleting service request ${id}`);
     
-    const response = await fetch(`${API_BASE_URL}/api/v1/service-requests/${id}`, {
+    const response = await fetch(`${API_BASE_URL}/api/service-requests/${id}`, {
       method: "DELETE",
       headers: getHeaders(),
     });
@@ -145,12 +123,13 @@ export const deleteServiceRequest = async (id) => {
   }
 };
 
-// ✅ Get service requests by status (if needed for filtering)
+// ==================== SERVICE REQUEST FILTERING ====================
+
 export const getServiceRequestsByStatus = async (status) => {
   try {
     console.log(`Fetching service requests with status: ${status}`);
     
-    const response = await fetch(`${API_BASE_URL}/api/v1/service-requests?status=${encodeURIComponent(status)}`, {
+    const response = await fetch(`${API_BASE_URL}/api/service-requests/status/${encodeURIComponent(status)}`, {
       method: "GET",
       headers: getHeaders(),
     });
@@ -168,69 +147,258 @@ export const getServiceRequestsByStatus = async (status) => {
   }
 };
 
-// ✅ Get service requests by guest ID (if needed for guest-specific requests)
-export const getServiceRequestsByGuestId = async (guestId) => {
+export const getServiceRequestsByType = async (serviceType) => {
   try {
-    console.log(`Fetching service requests for guest: ${guestId}`);
+    console.log(`Fetching service requests with type: ${serviceType}`);
     
-    const response = await fetch(`${API_BASE_URL}/api/v1/service-requests?guestId=${encodeURIComponent(guestId)}`, {
+    const response = await fetch(`${API_BASE_URL}/api/service-requests/type/${encodeURIComponent(serviceType)}`, {
       method: "GET",
       headers: getHeaders(),
     });
 
     if (!response.ok) {
-      throw new Error(`Failed to fetch service requests by guest ID: ${response.status}`);
+      throw new Error(`Failed to fetch service requests by type: ${response.status}`);
     }
 
     const data = await response.json();
-    console.log(`Fetched service requests for guest ${guestId}:`, data);
+    console.log(`Fetched service requests with type ${serviceType}:`, data);
     return data;
   } catch (error) {
-    console.error('Error fetching service requests by guest ID:', error);
+    console.error('Error fetching service requests by type:', error);
     throw error;
   }
 };
 
-// ✅ Mark service request as completed
+export const getServiceRequestsByPriority = async (priority) => {
+  try {
+    console.log(`Fetching service requests with priority: ${priority}`);
+    
+    const response = await fetch(`${API_BASE_URL}/api/service-requests/priority/${encodeURIComponent(priority)}`, {
+      method: "GET",
+      headers: getHeaders(),
+    });
+
+    if (!response.ok) {
+      throw new Error(`Failed to fetch service requests by priority: ${response.status}`);
+    }
+
+    const data = await response.json();
+    console.log(`Fetched service requests with priority ${priority}:`, data);
+    return data;
+  } catch (error) {
+    console.error('Error fetching service requests by priority:', error);
+    throw error;
+  }
+};
+
+export const getServiceRequestsByReservation = async (reservationId) => {
+  try {
+    console.log(`Fetching service requests for reservation: ${reservationId}`);
+    
+    const response = await fetch(`${API_BASE_URL}/api/service-requests/reservation/${reservationId}`, {
+      method: "GET",
+      headers: getHeaders(),
+    });
+
+    if (!response.ok) {
+      throw new Error(`Failed to fetch service requests by reservation: ${response.status}`);
+    }
+
+    const data = await response.json();
+    console.log(`Fetched service requests for reservation ${reservationId}:`, data);
+    return data;
+  } catch (error) {
+    console.error('Error fetching service requests by reservation:', error);
+    throw error;
+  }
+};
+
+export const getServiceRequestsByRoom = async (roomId) => {
+  try {
+    console.log(`Fetching service requests for room: ${roomId}`);
+    
+    const response = await fetch(`${API_BASE_URL}/api/service-requests/room/${roomId}`, {
+      method: "GET",
+      headers: getHeaders(),
+    });
+
+    if (!response.ok) {
+      throw new Error(`Failed to fetch service requests by room: ${response.status}`);
+    }
+
+    const data = await response.json();
+    console.log(`Fetched service requests for room ${roomId}:`, data);
+    return data;
+  } catch (error) {
+    console.error('Error fetching service requests by room:', error);
+    throw error;
+  }
+};
+
+export const getServiceRequestsByAssignedStaff = async (staffId) => {
+  try {
+    console.log(`Fetching service requests for staff: ${staffId}`);
+    
+    const response = await fetch(`${API_BASE_URL}/api/service-requests/staff/${encodeURIComponent(staffId)}`, {
+      method: "GET",
+      headers: getHeaders(),
+    });
+
+    if (!response.ok) {
+      throw new Error(`Failed to fetch service requests by staff: ${response.status}`);
+    }
+
+    const data = await response.json();
+    console.log(`Fetched service requests for staff ${staffId}:`, data);
+    return data;
+  } catch (error) {
+    console.error('Error fetching service requests by staff:', error);
+    throw error;
+  }
+};
+
+export const getPendingRequests = async () => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/service-requests/pending`, {
+      method: "GET",
+      headers: getHeaders(),
+    });
+
+    if (!response.ok) {
+      throw new Error(`Failed to fetch pending requests: ${response.status}`);
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error('Error fetching pending requests:', error);
+    throw error;
+  }
+};
+
+export const getUrgentRequests = async () => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/service-requests/urgent`, {
+      method: "GET",
+      headers: getHeaders(),
+    });
+
+    if (!response.ok) {
+      throw new Error(`Failed to fetch urgent requests: ${response.status}`);
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error('Error fetching urgent requests:', error);
+    throw error;
+  }
+};
+
+export const getIncompleteRequests = async () => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/service-requests/incomplete`, {
+      method: "GET",
+      headers: getHeaders(),
+    });
+
+    if (!response.ok) {
+      throw new Error(`Failed to fetch incomplete requests: ${response.status}`);
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error('Error fetching incomplete requests:', error);
+    throw error;
+  }
+};
+
+// ==================== SERVICE REQUEST STATUS MANAGEMENT ====================
+
+export const assignToStaff = async (requestId, staffId) => {
+  try {
+    console.log(`Assigning service request ${requestId} to staff ${staffId}`);
+    
+    const response = await fetch(
+      `${API_BASE_URL}/api/service-requests/${requestId}/assign?staffId=${encodeURIComponent(staffId)}`,
+      {
+        method: "PATCH",
+        headers: getHeaders(),
+      }
+    );
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`Failed to assign request: ${errorText}`);
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error('Error assigning service request:', error);
+    throw error;
+  }
+};
+
+export const updateStatus = async (requestId, status) => {
+  try {
+    console.log(`Updating service request ${requestId} status to ${status}`);
+    
+    const response = await fetch(
+      `${API_BASE_URL}/api/service-requests/${requestId}/status?status=${encodeURIComponent(status)}`,
+      {
+        method: "PATCH",
+        headers: getHeaders(),
+      }
+    );
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`Failed to update status: ${errorText}`);
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error('Error updating service request status:', error);
+    throw error;
+  }
+};
+
 export const markServiceRequestCompleted = async (id) => {
   try {
     console.log(`Marking service request ${id} as completed`);
     
-    // First get the current request data
-    const currentRequest = await getServiceRequestById(id);
-    
-    // Update with completed status
-    const updatedRequest = {
-      ...currentRequest,
-      status: 'COMPLETED',
-      completedAt: new Date().toISOString()
-    };
-    
-    return await updateServiceRequest(id, updatedRequest);
+    const response = await fetch(`${API_BASE_URL}/api/service-requests/${id}/complete`, {
+      method: "POST",
+      headers: getHeaders(),
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`Failed to mark as completed: ${errorText}`);
+    }
+
+    return await response.json();
   } catch (error) {
     console.error('Error marking service request as completed:', error);
     throw error;
   }
 };
 
-// ✅ Mark service request as in progress
-export const markServiceRequestInProgress = async (id) => {
+export const getServiceRequestsByDateRange = async (startDate, endDate) => {
   try {
-    console.log(`Marking service request ${id} as in progress`);
-    
-    // First get the current request data
-    const currentRequest = await getServiceRequestById(id);
-    
-    // Update with in progress status
-    const updatedRequest = {
-      ...currentRequest,
-      status: 'IN_PROGRESS',
-      startedAt: new Date().toISOString()
-    };
-    
-    return await updateServiceRequest(id, updatedRequest);
+    const response = await fetch(
+      `${API_BASE_URL}/api/service-requests/date-range?startDate=${startDate}&endDate=${endDate}`,
+      {
+        method: "GET",
+        headers: getHeaders(),
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error(`Failed to fetch requests by date range: ${response.status}`);
+    }
+
+    return await response.json();
   } catch (error) {
-    console.error('Error marking service request as in progress:', error);
+    console.error('Error fetching service requests by date range:', error);
     throw error;
   }
 };
@@ -242,7 +410,16 @@ export default {
   getAllServiceRequests,
   deleteServiceRequest,
   getServiceRequestsByStatus,
-  getServiceRequestsByGuestId,
+  getServiceRequestsByType,
+  getServiceRequestsByPriority,
+  getServiceRequestsByReservation,
+  getServiceRequestsByRoom,
+  getServiceRequestsByAssignedStaff,
+  getPendingRequests,
+  getUrgentRequests,
+  getIncompleteRequests,
+  assignToStaff,
+  updateStatus,
   markServiceRequestCompleted,
-  markServiceRequestInProgress
+  getServiceRequestsByDateRange
 };

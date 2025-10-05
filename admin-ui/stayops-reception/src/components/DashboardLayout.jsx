@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { 
   Dashboard as LayoutDashboard, 
@@ -9,7 +9,12 @@ import {
   Settings, 
   Logout as LogOut,
   Menu,
-  Close as X
+  Close as X,
+  AutoFixHigh as Automation,
+  TrendingUp,
+  Security as SecurityIcon,
+  CleaningServices,
+  Language
 } from '@mui/icons-material';
 
 const sidebarItems = [
@@ -24,18 +29,52 @@ const sidebarItems = [
   { text: 'Communication', icon: Users, path: '/dashboard/communication' },
   { text: 'Reporting', icon: Users, path: '/dashboard/reporting' },
   { text: 'Security', icon: Users, path: '/dashboard/security' },
+  { 
+    text: 'Automation', 
+    icon: Automation, 
+    path: '/dashboard/automation',
+    children: [
+      { text: 'Dashboard', icon: LayoutDashboard, path: '/dashboard/automation' },
+      { text: 'Dynamic Pricing', icon: TrendingUp, path: '/dashboard/automation/pricing' },
+      { text: 'Fraud Detection', icon: SecurityIcon, path: '/dashboard/automation/fraud' },
+      { text: 'Housekeeping Tasks', icon: CleaningServices, path: '/dashboard/automation/housekeeping' },
+      { text: 'OTA Channel Management', icon: Language, path: '/dashboard/automation/ota' }
+    ]
+  },
   { text: 'Settings', icon: Settings, path: '/dashboard/settings' },
   { text: 'QR Scanner', icon: Users, path: '/dashboard/qr-scanner'}
 ];
 
 export default function DashboardLayout({ onLogout }) {
   const [isOpen, setIsOpen] = useState(true);
+  const [expandedItems, setExpandedItems] = useState({});
   const navigate = useNavigate();
   const location = useLocation();
 
   const handleItemClick = (path) => {
     navigate(path);
   };
+
+  const toggleExpanded = (itemText) => {
+    setExpandedItems(prev => ({
+      ...prev,
+      [itemText]: !prev[itemText]
+    }));
+  };
+
+  const isChildActive = (children) => {
+    return children?.some(child => location.pathname === child.path);
+  };
+
+  // Auto-expand automation menu when on automation routes
+  useEffect(() => {
+    if (location.pathname.startsWith('/dashboard/automation')) {
+      setExpandedItems(prev => ({
+        ...prev,
+        'Automation': true
+      }));
+    }
+  }, [location.pathname]);
 
   const handleSignOut = () => {
     if (window.confirm('Are you sure you want to logout?')) {
@@ -140,48 +179,118 @@ export default function DashboardLayout({ onLogout }) {
             {sidebarItems.map((item, index) => {
               const IconComponent = item.icon;
               const isSelected = location.pathname === item.path;
+              const hasChildren = item.children && item.children.length > 0;
+              const isExpanded = expandedItems[item.text];
+              const isParentActive = hasChildren && isChildActive(item.children);
               
               return (
                 <div key={item.text} style={{ marginBottom: '1px' }}>
                   <button
-                    onClick={() => handleItemClick(item.path)}
+                    onClick={() => hasChildren ? toggleExpanded(item.text) : handleItemClick(item.path)}
                     style={{
                       width: '100%',
                       padding: '6px 16px',
                       minHeight: '32px',
-                      backgroundColor: isSelected ? 'black' : 'transparent',
-                      color: isSelected ? 'white' : 'black',
+                      backgroundColor: (isSelected || isParentActive) ? 'black' : 'transparent',
+                      color: (isSelected || isParentActive) ? 'white' : 'black',
                       border: 'none',
                       display: 'flex',
                       alignItems: 'center',
+                      justifyContent: 'space-between',
                       cursor: 'pointer',
                       transition: 'all 0.2s ease-in-out',
                       fontSize: '13px',
-                      fontWeight: isSelected ? '400' : '300',
+                      fontWeight: (isSelected || isParentActive) ? '400' : '300',
                       letterSpacing: '0.2px',
                     }}
                     onMouseEnter={(e) => {
-                      if (!isSelected) {
+                      if (!isSelected && !isParentActive) {
                         e.target.style.backgroundColor = '#f9f9f9';
                         e.target.style.border = '1px solid #e0e0e0';
                       }
                     }}
                     onMouseLeave={(e) => {
-                      if (!isSelected) {
+                      if (!isSelected && !isParentActive) {
                         e.target.style.backgroundColor = 'transparent';
                         e.target.style.border = 'none';
                       }
                     }}
                   >
-                    <IconComponent
-                      style={{
-                        fontSize: 14,
-                        marginRight: '10px',
-                        color: isSelected ? 'white' : 'black',
-                      }}
-                    />
-                    {item.text}
+                    <div style={{ display: 'flex', alignItems: 'center' }}>
+                      <IconComponent
+                        style={{
+                          fontSize: 14,
+                          marginRight: '10px',
+                          color: (isSelected || isParentActive) ? 'white' : 'black',
+                        }}
+                      />
+                      {item.text}
+                    </div>
+                    {hasChildren && (
+                      <span style={{ 
+                        fontSize: 10, 
+                        color: (isSelected || isParentActive) ? 'white' : 'black',
+                        transform: isExpanded ? 'rotate(90deg)' : 'rotate(0deg)',
+                        transition: 'transform 0.2s ease-in-out'
+                      }}>
+                        ▶
+                      </span>
+                    )}
                   </button>
+                  
+                  {/* Submenu for children */}
+                  {hasChildren && isExpanded && (
+                    <div style={{ marginLeft: '20px', marginTop: '2px' }}>
+                      {item.children.map((child, childIndex) => {
+                        const ChildIconComponent = child.icon;
+                        const isChildSelected = location.pathname === child.path;
+                        
+                        return (
+                          <button
+                            key={child.text}
+                            onClick={() => handleItemClick(child.path)}
+                            style={{
+                              width: '100%',
+                              padding: '4px 12px',
+                              minHeight: '28px',
+                              backgroundColor: isChildSelected ? '#333' : 'transparent',
+                              color: isChildSelected ? 'white' : '#666',
+                              border: 'none',
+                              display: 'flex',
+                              alignItems: 'center',
+                              cursor: 'pointer',
+                              transition: 'all 0.2s ease-in-out',
+                              fontSize: '12px',
+                              fontWeight: isChildSelected ? '400' : '300',
+                              letterSpacing: '0.2px',
+                              marginBottom: '1px',
+                            }}
+                            onMouseEnter={(e) => {
+                              if (!isChildSelected) {
+                                e.target.style.backgroundColor = '#f5f5f5';
+                                e.target.style.color = '#333';
+                              }
+                            }}
+                            onMouseLeave={(e) => {
+                              if (!isChildSelected) {
+                                e.target.style.backgroundColor = 'transparent';
+                                e.target.style.color = '#666';
+                              }
+                            }}
+                          >
+                            <ChildIconComponent
+                              style={{
+                                fontSize: 12,
+                                marginRight: '8px',
+                                color: isChildSelected ? 'white' : '#666',
+                              }}
+                            />
+                            {child.text}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  )}
                 </div>
               );
             })}

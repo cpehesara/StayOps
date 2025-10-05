@@ -1,7 +1,7 @@
 package com.example.stayops.entity;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
@@ -18,6 +18,7 @@ import java.util.List;
 @Builder
 @ToString(exclude = {"hotel", "reservations"})
 @EqualsAndHashCode(exclude = {"hotel", "reservations"})
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Room {
 
     @Id
@@ -45,10 +46,9 @@ public class Room {
 
     @ManyToOne(fetch = FetchType.LAZY, optional = true)
     @JoinColumn(name = "hotel_id", nullable = true)
-    @JsonBackReference
+    @JsonIgnoreProperties({"staffMembers", "rooms", "departments", "amenities"})
     private Hotel hotel;
 
-    // Room is NOT the owning side - Reservation owns the relationship
     @ManyToMany(mappedBy = "rooms", fetch = FetchType.LAZY)
     @JsonIgnore
     @Builder.Default

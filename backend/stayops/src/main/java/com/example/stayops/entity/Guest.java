@@ -1,5 +1,6 @@
 package com.example.stayops.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -20,10 +21,11 @@ import java.time.Instant;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler", "qrCodeImage"})
 public class Guest {
 
     @Id
-    @Column(name = "guest_id", updatable = false,nullable = false,unique = true)
+    @Column(name = "guest_id", updatable = false, nullable = false, unique = true)
     private String guestId;
 
     @NotBlank

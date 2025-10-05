@@ -1,22 +1,30 @@
 package com.example.stayops.dto;
 
-import com.example.stayops.entity.ServiceRequest.RequestStatus;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
 @Builder
 public class ServiceRequestDTO {
-    private Long requestId;
-    private Long reservationId;
-    private String guestId;
-    private Long roomId;
-    private Long serviceTypeId;
-    private String assignedTo;
+
+    private Long id;
+    private String serviceType;  // HOUSEKEEPING, ROOM_SERVICE, MAINTENANCE, LAUNDRY
     private String description;
-    private LocalDateTime requestAt;
-    private RequestStatus status;
+    private String status;  // PENDING, IN_PROGRESS, COMPLETED, CANCELLED
+    private String requestedBy;  // Guest ID or name
+    private String priority;  // LOW, MEDIUM, HIGH, URGENT
+    private Long reservationId;
+    private Long roomId;
+    private String roomNumber;  // For display purposes
+    private String assignedTo;  // Staff member assigned
+    private Instant completedAt;
+    private String notes;
+    private Instant createdAt;
+    private Instant updatedAt;
 }

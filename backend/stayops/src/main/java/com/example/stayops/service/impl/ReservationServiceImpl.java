@@ -16,7 +16,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import com.example.stayops.entity.AuditLog;
+import com.example.stayops.repository.AuditLogRepository;
 
+import java.time.Instant;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -31,6 +34,7 @@ public class ReservationServiceImpl implements ReservationService {
     private final GuestRepository guestRepository;
     private final RoomRepository roomRepository;
     private final ReservationHistoryService historyService;
+    private final AuditLogRepository auditLogRepository;
 
     // ==================== CRUD OPERATIONS ====================
 
@@ -50,11 +54,17 @@ public class ReservationServiceImpl implements ReservationService {
         Set<Room> rooms = fetchAndValidateRooms(requestDTO.getRoomIds(),
                 requestDTO.getCheckInDate(), requestDTO.getCheckOutDate(), null);
 
-        // Create reservation with all required fields
+        // IMPORTANT: Auto-determine initial status based on check-in date
+        ReservationStatus initialStatus = determineInitialStatus(
+                requestDTO.getCheckInDate(),
+                requestDTO.getStatus()
+        );
+
+        // Create reservation with determined status
         Reservation reservation = Reservation.builder()
                 .checkInDate(requestDTO.getCheckInDate())
                 .checkOutDate(requestDTO.getCheckOutDate())
-                .status(requestDTO.getStatus() != null ? requestDTO.getStatus() : ReservationStatus.PENDING)
+                .status(initialStatus) // Use auto-determined status
                 .guest(guest)
                 .rooms(rooms)
                 .build();
@@ -76,11 +86,38 @@ public class ReservationServiceImpl implements ReservationService {
         // Save everything in one transaction
         Reservation saved = reservationRepository.save(reservation);
 
-        // Record history
-        recordStatusChange(saved, null, saved.getStatus(), "System", "Reservation created");
+        // Log audit with special note if auto-confirmed
+        String auditNote = initialStatus == ReservationStatus.CONFIRMED &&
+                requestDTO.getCheckInDate().equals(LocalDate.now())
+                ? "Reservation created and AUTO-CONFIRMED (same-day booking)"
+                : "Reservation created for guest: " + requestDTO.getGuestId();
 
-        log.info("Reservation created successfully with ID: {}", saved.getReservationId());
+        logAudit("RESERVATION", saved.getReservationId().toString(),
+                "CREATE", "SYSTEM", "API", auditNote);
+
+        // Record history
+        recordStatusChange(saved, null, saved.getStatus(), "System",
+                initialStatus == ReservationStatus.CONFIRMED &&
+                        requestDTO.getCheckInDate().equals(LocalDate.now())
+                        ? "Auto-confirmed same-day reservation"
+                        : "Reservation created");
+
+        log.info("Reservation created successfully with ID: {} (Status: {})",
+                saved.getReservationId(), saved.getStatus());
+
         return mapToResponseDTO(saved);
+    }
+
+    // Add this helper method to ReservationServiceImpl
+    private ReservationStatus determineInitialStatus(LocalDate checkInDate, ReservationStatus requestedStatus) {
+        // If check-in is today, automatically confirm (skip PENDING status)
+        if (checkInDate.equals(LocalDate.now())) {
+            log.info("Same-day reservation detected - auto-confirming (bypassing PENDING status)");
+            return ReservationStatus.CONFIRMED;
+        }
+
+        // Otherwise, use the requested status (typically PENDING)
+        return requestedStatus != null ? requestedStatus : ReservationStatus.PENDING;
     }
 
     @Override
@@ -730,5 +767,24 @@ public class ReservationServiceImpl implements ReservationService {
                 .createdAt(r.getCreatedAt())
                 .updatedAt(r.getUpdatedAt())
                 .build();
+    }
+
+    private void logAudit(String entityType, String entityId, String action,
+                          String actorType, String actorId, String description) {
+        try {
+            AuditLog log = AuditLog.builder()
+                    .entityType(entityType)
+                    .entityId(entityId)
+                    .action(action)
+                    .actorType(actorType)
+                    .actorId(actorId)
+                    .description(description)
+                    .timestamp(Instant.now())
+                    .build();
+
+            auditLogRepository.save(log);
+        } catch (Exception e) {
+            log.error("Failed to create audit log: {}", e.getMessage());
+        }
     }
 }
