@@ -3,7 +3,8 @@ import { Link, useLocation } from 'react-router-dom';
 import { 
   Home, Users, Bed, Calendar, DollarSign, MessageSquare, 
   FileText, Shield, Settings, LogOut, ChevronDown, ChevronRight,
-  Zap, TrendingUp, AlertTriangle, Briefcase, Globe, UserCheck
+  Zap, TrendingUp, AlertTriangle, Briefcase, Globe, UserCheck,
+  Bell, MessageCircle, Star, FileWarning
 } from 'lucide-react';
 
 const SideBar = ({ onLogout }) => {
@@ -22,6 +23,10 @@ const SideBar = ({ onLogout }) => {
     { path: '/dashboard/billing', icon: DollarSign, label: 'Billing' },
     { path: '/dashboard/guest-requests', icon: MessageSquare, label: 'Guest Requests' },
     { path: '/dashboard/communication', icon: MessageSquare, label: 'Communication' },
+    { path: '/dashboard/notifications', icon: Bell, label: 'Notifications' },
+    { path: '/dashboard/messages', icon: MessageCircle, label: 'Community Messages' },
+    { path: '/dashboard/ratings', icon: Star, label: 'Ratings & Reviews' },
+    { path: '/dashboard/complaints', icon: FileWarning, label: 'Complaints' },
     { path: '/dashboard/reporting', icon: FileText, label: 'Reports' },
     { path: '/dashboard/security', icon: Shield, label: 'Security' },
   ];
@@ -43,7 +48,7 @@ const SideBar = ({ onLogout }) => {
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 py-6">
+      <nav className="flex-1 py-6 overflow-y-auto">
         <ul className="space-y-1 px-3">
           {menuItems.map((item) => (
             <li key={item.path}>

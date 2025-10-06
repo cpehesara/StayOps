@@ -18,6 +18,12 @@ import Security from './pages/Security.jsx';
 import Settings from './pages/Settings.jsx';
 import QRScanner from './components/QRScanner.jsx';
 
+// New Feature Pages
+import Notifications from './pages/Notifications.jsx';
+import CommunityMessages from './pages/CommunityMessages.jsx';
+import Ratings from './pages/Ratings.jsx';
+import Complaints from './pages/Complaints.jsx';
+
 // Automation Pages
 import AutomationDashboard from './pages/AutomationDashboard.jsx';
 import DynamicPricing from './pages/DynamicPricing.jsx';
@@ -30,7 +36,6 @@ function App() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Check if user is already authenticated
     const authStatus = localStorage.getItem('isAuthenticated') === 'true';
     setIsAuthenticated(authStatus);
     setLoading(false);
@@ -63,7 +68,6 @@ function App() {
 
   return (
     <Routes>
-      {/* Login Route */}
       <Route 
         path="/login" 
         element={
@@ -73,10 +77,8 @@ function App() {
         } 
       />
       
-      {/* Route for standalone sidebar demo */}
       <Route path="/sidebar" element={<StayOpsSidebar />} />
       
-      {/* Protected Dashboard routes with layout */}
       <Route 
         path="/dashboard" 
         element={
@@ -100,6 +102,12 @@ function App() {
         <Route path="qr-scanner" element={<QRScanner />} />
         <Route path="settings" element={<Settings />} />
         
+        {/* New Feature Pages */}
+        <Route path="notifications" element={<Notifications />} />
+        <Route path="messages" element={<CommunityMessages />} />
+        <Route path="ratings" element={<Ratings />} />
+        <Route path="complaints" element={<Complaints />} />
+        
         {/* Automation Pages */}
         <Route path="automation" element={<AutomationDashboard />} />
         <Route path="automation/pricing" element={<DynamicPricing />} />
@@ -107,11 +115,9 @@ function App() {
         <Route path="automation/housekeeping" element={<HousekeepingTasks />} />
         <Route path="automation/ota" element={<OTAChannelManagement />} />
         
-        {/* Default redirect */}
         <Route index element={<Navigate to="overview" replace />} />
       </Route>
       
-      {/* Root redirect */}
       <Route 
         path="/" 
         element={
@@ -122,7 +128,6 @@ function App() {
         } 
       />
       
-      {/* Catch all route */}
       <Route 
         path="*" 
         element={

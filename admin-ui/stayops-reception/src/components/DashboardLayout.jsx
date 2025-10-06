@@ -14,7 +14,11 @@ import {
   TrendingUp,
   Security as SecurityIcon,
   CleaningServices,
-  Language
+  Language,
+  Notifications as NotificationIcon,
+  Chat as ChatIcon,
+  Star as StarIcon,
+  Report as ReportIcon
 } from '@mui/icons-material';
 
 const sidebarItems = [
@@ -27,6 +31,10 @@ const sidebarItems = [
   { text: 'Billing', icon: Receipt, path: '/dashboard/billing' },
   { text: 'Guest Requests', icon: Users, path: '/dashboard/guest-requests' },
   { text: 'Communication', icon: Users, path: '/dashboard/communication' },
+  { text: 'Notifications', icon: NotificationIcon, path: '/dashboard/notifications' },
+  { text: 'Community Messages', icon: ChatIcon, path: '/dashboard/messages' },
+  { text: 'Ratings & Reviews', icon: StarIcon, path: '/dashboard/ratings' },
+  { text: 'Complaints', icon: ReportIcon, path: '/dashboard/complaints' },
   { text: 'Reporting', icon: Users, path: '/dashboard/reporting' },
   { text: 'Security', icon: Users, path: '/dashboard/security' },
   { 
@@ -66,7 +74,6 @@ export default function DashboardLayout({ onLogout }) {
     return children?.some(child => location.pathname === child.path);
   };
 
-  // Auto-expand automation menu when on automation routes
   useEffect(() => {
     if (location.pathname.startsWith('/dashboard/automation')) {
       setExpandedItems(prev => ({
@@ -91,7 +98,6 @@ export default function DashboardLayout({ onLogout }) {
 
   return (
     <div style={{ display: 'flex', minHeight: '100vh' }}>
-      {/* Toggle Button */}
       <button
         onClick={toggleSidebar}
         style={{
@@ -113,7 +119,6 @@ export default function DashboardLayout({ onLogout }) {
         {isOpen ? <X style={{ fontSize: 18 }} /> : <Menu style={{ fontSize: 18 }} />}
       </button>
 
-      {/* Sidebar */}
       <div
         style={{
           width: isOpen ? '280px' : '0',
@@ -126,7 +131,6 @@ export default function DashboardLayout({ onLogout }) {
           height: '100vh',
         }}
       >
-        {/* Header */}
         <div
           style={{
             padding: '16px 24px 12px 24px',
@@ -161,20 +165,18 @@ export default function DashboardLayout({ onLogout }) {
           </p>
         </div>
 
-        {/* Navigation Items */}
         <div style={{ 
           flex: 1, 
           paddingTop: '8px',
           display: 'flex',
           flexDirection: 'column',
-          overflow: 'hidden'
+          overflow: 'auto'
         }}>
           <nav style={{ 
             padding: '0 12px',
             flex: 1,
             display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'space-evenly'
+            flexDirection: 'column'
           }}>
             {sidebarItems.map((item, index) => {
               const IconComponent = item.icon;
@@ -238,7 +240,6 @@ export default function DashboardLayout({ onLogout }) {
                     )}
                   </button>
                   
-                  {/* Submenu for children */}
                   {hasChildren && isExpanded && (
                     <div style={{ marginLeft: '20px', marginTop: '2px' }}>
                       {item.children.map((child, childIndex) => {
@@ -297,7 +298,6 @@ export default function DashboardLayout({ onLogout }) {
           </nav>
         </div>
 
-        {/* Bottom Section */}
         <div
           style={{
             borderTop: '1px solid black',
@@ -305,7 +305,6 @@ export default function DashboardLayout({ onLogout }) {
             flexShrink: 0,
           }}
         >
-          {/* User Info */}
           <div
             style={{
               padding: '8px 12px',
@@ -374,7 +373,6 @@ export default function DashboardLayout({ onLogout }) {
         </div>
       </div>
 
-      {/* Main Content Area */}
       <div
         style={{
           flex: 1,
