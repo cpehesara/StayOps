@@ -1,0 +1,286 @@
+/* ==========================================
+   StayOps Service Manager Sidebar Styles
+   ========================================== */
+
+/* Sidebar Container */
+.sidebar {
+  width: 256px;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background-color: #ffffff;
+  border-right: 1px solid #e8e3dc;
+}
+
+/* Header/Logo Section */
+.sidebar-header {
+  padding: 24px;
+  border-bottom: 1px solid #e8e3dc;
+  background-color: #ffffff;
+}
+
+.sidebar-logo {
+  font-size: 24px;
+  font-weight: 300;
+  letter-spacing: -0.4px;
+  color: #2c2c2e;
+  margin: 0;
+}
+
+.sidebar-subtitle {
+  font-size: 11px;
+  color: #8b8680;
+  margin: 4px 0 0 0;
+}
+
+/* Navigation Section */
+.sidebar-nav {
+  flex: 1;
+  padding: 24px 0;
+  overflow-y: auto;
+  user-select: none;
+  background-color: #ffffff;
+}
+
+.nav-list {
+  list-style: none;
+  margin: 0;
+  padding: 0 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.nav-item {
+  margin: 0;
+  padding: 0;
+}
+
+/* Navigation Links */
+.nav-link,
+.nav-button {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  font-size: 13px;
+  text-decoration: none;
+  background-color: transparent;
+  color: #2c2c2e;
+  border-radius: 8px;
+  font-weight: 400;
+  transition: all 0.2s ease;
+  outline: none;
+  border: none;
+  cursor: pointer;
+  width: 100%;
+  text-align: left;
+}
+
+.nav-link:hover,
+.nav-link.hovered,
+.nav-button:hover,
+.nav-button.hovered {
+  background-color: #f5f2ee;
+  color: #2c2c2e;
+}
+
+.nav-link.active,
+.nav-button.active {
+  background-color: #b8956a;
+  color: #ffffff;
+  font-weight: 500;
+}
+
+.nav-link:focus,
+.nav-button:focus {
+  outline: none;
+  box-shadow: none;
+}
+
+.nav-link:active,
+.nav-link:visited {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* Navigation Button (for expandable items) */
+.nav-button {
+  justify-content: space-between;
+}
+
+.nav-button-content {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* Section Groups */
+.section-group {
+  padding-top: 12px;
+}
+
+/* Navigation Divider */
+.nav-divider-wrapper {
+  margin: 12px 0;
+}
+
+.nav-divider {
+  height: 1px;
+  background-color: #e8e3dc;
+  margin: 0 12px;
+}
+
+/* Sub-navigation (nested items) */
+.sub-nav-list {
+  list-style: none;
+  margin: 4px 0 0 16px;
+  padding: 0 0 0 8px;
+  border-left: 2px solid #e8e3dc;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.sub-nav-item {
+  margin: 0;
+  padding: 0;
+}
+
+.sub-nav-link {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 12px;
+  font-size: 13px;
+  text-decoration: none;
+  background-color: transparent;
+  color: #5a5550;
+  border-radius: 8px;
+  font-weight: 400;
+  transition: all 0.2s ease;
+  outline: none;
+  border: none;
+}
+
+.sub-nav-link:hover,
+.sub-nav-link.hovered {
+  background-color: #f5f2ee;
+  color: #2c2c2e;
+}
+
+.sub-nav-link.active {
+  background-color: #d4c4a8;
+  color: #2c2c2e;
+  font-weight: 500;
+}
+
+.sub-nav-link:focus {
+  outline: none;
+  box-shadow: none;
+}
+
+.sub-nav-link:active,
+.sub-nav-link:visited {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* Settings Section */
+.settings-section {
+  border-top: 1px solid #e8e3dc;
+  margin-top: 12px;
+  padding-top: 12px;
+}
+
+/* Sidebar Footer (Logout) */
+.sidebar-footer {
+  padding: 12px;
+  border-top: 1px solid #e8e3dc;
+}
+
+.logout-button {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  font-size: 13px;
+  background-color: transparent;
+  color: #5a5550;
+  border: none;
+  border-radius: 8px;
+  font-weight: 400;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  outline: none;
+  text-align: left;
+}
+
+.logout-button:hover,
+.logout-button.hovered {
+  background-color: #fee2e2;
+  color: #dc2626;
+}
+
+.logout-button:focus {
+  outline: none;
+  box-shadow: none;
+}
+
+/* Custom Scrollbar */
+.sidebar-nav::-webkit-scrollbar {
+  width: 6px;
+}
+
+.sidebar-nav::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.sidebar-nav::-webkit-scrollbar-thumb {
+  background: #e8e3dc;
+  border-radius: 3px;
+}
+
+.sidebar-nav::-webkit-scrollbar-thumb:hover {
+  background: #c4bbb0;
+}
+
+/* Remove default link underline */
+.nav-link,
+.sub-nav-link {
+  text-decoration: none !important;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .sidebar {
+    width: 100%;
+    min-height: auto;
+  }
+
+  .sidebar-header {
+    padding: 20px;
+  }
+
+  .sidebar-logo {
+    font-size: 20px;
+  }
+
+  .sidebar-nav {
+    padding: 16px 0;
+  }
+
+  .nav-list {
+    padding: 0 8px;
+  }
+
+  .nav-link,
+  .nav-button {
+    padding: 12px;
+  }
+
+  .sub-nav-link {
+    padding: 10px 12px;
+  }
+}

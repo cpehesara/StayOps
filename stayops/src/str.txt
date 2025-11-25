@@ -1,0 +1,276 @@
+Folder PATH listing for volume New Volume
+Volume serial number is C422-C9D8
+D:.
+|   App.css
+|   App.jsx
+|   index.css
+|   main.jsx
+|   str.txt
+|   
++---assets
+|   |   react.svg
+|   |   
+|   \---icons
+|           zoom.png
+|           
++---components
+|   |   Login.jsx
+|   |   
+|   +---common
+|   |       DataTable.jsx
+|   |       EnhancedForm.jsx
+|   |       Footer.jsx
+|   |       
+|   \---RoomViewer
+|           Panorama360.css
+|           Panorama360.jsx
+|           RoomDetails.css
+|           RoomDetails.jsx
+|           RoomGallery.css
+|           RoomGallery.jsx
+|           
++---config
+|       api.js
+|       user.js
+|       
++---constants
+|       index.js
+|       
++---hooks
+|       index.js
+|       
++---portals
+|   +---stayops-operational-manager
+|   |   +---api
+|   |   |       automation.js
+|   |   |       complaints.js
+|   |   |       department.js
+|   |   |       guest.js
+|   |   |       messages.js
+|   |   |       metrics.js
+|   |   |       notifications.js
+|   |   |       performance.js
+|   |   |       ratings.js
+|   |   |       reception.js
+|   |   |       receptionistService.js
+|   |   |       reservation.js
+|   |   |       room.js
+|   |   |       service-request-api.js
+|   |   |       service.js
+|   |   |       staff.js
+|   |   |       userService.js
+|   |   |       
+|   |   +---asset
+|   |   |   +---icons
+|   |   |   |       zoom.png
+|   |   |   |       
+|   |   |   \---img
+|   |   |           -99170515271_92032625635_1730704593_n.jpg
+|   |   |           -99517281565_91685859341_1730702785_n.jpg
+|   |   |           logo.jpg
+|   |   |           logo.png
+|   |   |           
+|   |   +---components
+|   |   |       AutomationMetricsWidget.jsx
+|   |   |       DebugPage.jsx
+|   |   |       DepartmentForm.jsx
+|   |   |       OperationalManagerDashboardLayout.jsx
+|   |   |       PageWrapper.jsx
+|   |   |       ProtectedRoute.jsx
+|   |   |       QRScanner.jsx
+|   |   |       ReservationCalendar.jsx
+|   |   |       SideBar.jsx
+|   |   |       TestPage.jsx
+|   |   |       
+|   |   +---pages
+|   |   |       AutomationDashboard.jsx
+|   |   |       Billing.jsx
+|   |   |       Communication.jsx
+|   |   |       CommunityMessages.jsx
+|   |   |       Complaints.jsx
+|   |   |       DepartmentView.jsx
+|   |   |       FraudDetection.jsx
+|   |   |       GuestRegistrationForm.jsx
+|   |   |       GuestRequests.jsx
+|   |   |       Guests.jsx
+|   |   |       HousekeepingTasks.jsx
+|   |   |       OperationalManagerDashboard.jsx
+|   |   |       OTAChannelManagement.jsx
+|   |   |       PaymentAutomation.jsx
+|   |   |       Reservations.jsx
+|   |   |       RoomView.jsx
+|   |   |       Security.jsx
+|   |   |       ServiceRequests.jsx
+|   |   |       Settings.jsx
+|   |   |       StaffManagement.jsx
+|   |   |       
+|   |   \---styles
+|   |           billing.css
+|   |           checkinout.css
+|   |           communication.css
+|   |           community-messages.css
+|   |           complaints.css
+|   |           departmentForm.css
+|   |           departmentView.css
+|   |           guest-registration.css
+|   |           guest-requests.css
+|   |           guests.css
+|   |           modals.css
+|   |           operations-dashboard.css
+|   |           qr-scanner.css
+|   |           reservations.css
+|   |           rooms.css
+|   |           security.css
+|   |           service-requests.css
+|   |           settings.css
+|   |           sidebar.css
+|   |           staff.css
+|   |           theme.js
+|   |           
+|   +---stayops-receptionist
+|   |   +---api
+|   |   |       billing-api.js
+|   |   |       guest.js
+|   |   |       messages.js
+|   |   |       notifications.js
+|   |   |       reception.js
+|   |   |       reservation.js
+|   |   |       room.js
+|   |   |       roomFilter.js
+|   |   |       userService.js
+|   |   |       
+|   |   +---asset
+|   |   |   +---icons
+|   |   |   |       zoom.png
+|   |   |   |       
+|   |   |   \---img
+|   |   |           -99170515271_92032625635_1730704593_n.jpg
+|   |   |           -99517281565_91685859341_1730702785_n.jpg
+|   |   |           logo.jpg
+|   |   |           logo.png
+|   |   |           
+|   |   +---components
+|   |   |       DashboardLayout.jsx
+|   |   |       PageWrapper.jsx
+|   |   |       ProtectedRoute.jsx
+|   |   |       QRScanner.jsx
+|   |   |       ReservationCalendar.jsx
+|   |   |       SideBar.jsx
+|   |   |       
+|   |   +---pages
+|   |   |       AddChargeModal.jsx
+|   |   |       AddPaymentModal.jsx
+|   |   |       CheckInOut.jsx
+|   |   |       CommunityMessages.jsx
+|   |   |       CreateFolioModal.jsx
+|   |   |       FolioDetails.jsx
+|   |   |       GuestRegistrationForm.jsx
+|   |   |       Guests.jsx
+|   |   |       Notifications.jsx
+|   |   |       PaymentAutomation.jsx
+|   |   |       ReceptionistBilling.jsx
+|   |   |       ReceptionistDashboard.jsx
+|   |   |       Reporting.jsx
+|   |   |       Reservations.jsx
+|   |   |       Settings.jsx
+|   |   |       
+|   |   \---styles
+|   |           billing.css
+|   |           checkinout.css
+|   |           community-messages.css
+|   |           complaints.css
+|   |           dashboard.css
+|   |           guest-registration.css
+|   |           guest-requests.css
+|   |           guests.css
+|   |           modals.css
+|   |           notifications.css
+|   |           qr-scanner.css
+|   |           receptionist-layout.css
+|   |           reporting.css
+|   |           reservations.css
+|   |           rooms.css
+|   |           security.css
+|   |           settings.css
+|   |           sidebar.css
+|   |           tablet-room-selection.css
+|   |           theme.js
+|   |           
+|   +---stayops-service-manager
+|   |   +---api
+|   |   |       serviceRequestApi.js
+|   |   |       
+|   |   +---asset
+|   |   +---components
+|   |   |       ProtectedRoute.jsx
+|   |   |       ServiceManagerDashboardLayout.jsx
+|   |   |       TestPage.jsx
+|   |   |       
+|   |   +---pages
+|   |   |       ServiceManagerDashboard.jsx
+|   |   |       ServiceRequests.jsx
+|   |   |       
+|   |   \---styles
+|   |           service-dashboard.css
+|   |           service-requests.css
+|   |           sidebar.css
+|   |           
+|   \---stayops-system-admin
+|       +---api
+|       |       admin.js
+|       |       amenity-management.js
+|       |       amenity.js
+|       |       hotel.js
+|       |       notifications.js
+|       |       staff.js
+|       |       user-management.js
+|       |       users.js
+|       |       
+|       +---asset
+|       +---components
+|       |       ProtectedRoute.jsx
+|       |       SystemAdminDashboardLayout.jsx
+|       |       SystemAdminSideBar.jsx
+|       |       TestPage.jsx
+|       |       
+|       +---pages
+|       |       APIManagement.jsx
+|       |       BackupManagement.jsx
+|       |       HotelManagement.jsx
+|       |       Notifications.jsx
+|       |       OperationalManagersManagement.jsx
+|       |       ReceptionistsManagement.jsx
+|       |       SecurityCenter.jsx
+|       |       ServiceManagersManagement.jsx
+|       |       SystemAdminDashboard.jsx
+|       |       SystemAdminsManagement.jsx
+|       |       SystemReports.jsx
+|       |       SystemSettings.jsx
+|       |       TestNotifications.jsx
+|       |       UserManagement.jsx
+|       |       
+|       \---styles
+|               admin-dashboard.css
+|               api-management.css
+|               backup-management.css
+|               hotel-management.css
+|               notifications.css
+|               receptionists-management.css
+|               security-center.css
+|               sidebar.css
+|               system-reports.css
+|               system-settings.css
+|               theme.js
+|               user-management-modal.css
+|               user-management.css
+|               
++---services
+|       authService.js
+|       
+\---utils
+        api.js
+        common.js
+        localNotifications.js
+        toast.js
+        validationSchemas.js
+        

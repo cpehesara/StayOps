@@ -1,0 +1,257 @@
+/* ==========================================
+   StayOps Guest Registration Component Styles
+   ========================================== */
+
+/* Container */
+.guest-registration-container {
+  min-height: 100vh;
+  background-color: #faf8f5;
+}
+
+.guest-registration-wrapper {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 32px;
+}
+
+/* Header */
+.guest-registration-header {
+  margin-bottom: 32px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #e8e3dc;
+}
+
+.guest-registration-title {
+  font-size: 36px;
+  font-weight: 300;
+  color: #2c2c2e;
+  letter-spacing: -0.5px;
+  margin-bottom: 4px;
+}
+
+.guest-registration-subtitle {
+  font-size: 11px;
+  color: #8b8680;
+}
+
+/* Form Container */
+.guest-registration-form {
+  border: 1px solid #e8e3dc;
+  padding: 32px;
+  border-radius: 8px;
+  background-color: #fff;
+}
+
+/* Form Grid Layouts */
+.form-grid-2-cols {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 24px;
+  margin-bottom: 24px;
+}
+
+.form-field-full {
+  margin-bottom: 24px;
+}
+
+/* Form Labels */
+.form-label {
+  display: block;
+  font-size: 11px;
+  color: #8b8680;
+  margin-bottom: 8px;
+  letter-spacing: 0.5px;
+  font-weight: 500;
+}
+
+/* Form Inputs */
+.form-input,
+.form-select {
+  width: 100%;
+  padding: 12px 16px;
+  border: 1px solid #e8e3dc;
+  border-radius: 8px;
+  font-size: 13px;
+  color: #2c2c2e;
+  outline: none;
+  transition: all 0.2s ease;
+  font-family: inherit;
+  background-color: #fff;
+}
+
+.form-input:focus,
+.form-select:focus {
+  border-color: #b8956a;
+  box-shadow: 0 0 0 3px rgba(184, 149, 106, 0.1);
+}
+
+.form-input:disabled,
+.form-select:disabled {
+  background-color: #f5f2ee;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.form-input::placeholder {
+  color: #c4bbb0;
+}
+
+/* File Input */
+.form-file-input {
+  width: 100%;
+  padding: 12px 16px;
+  border: 1px solid #e8e3dc;
+  border-radius: 8px;
+  font-size: 13px;
+  color: #2c2c2e;
+  outline: none;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  background-color: #fff;
+}
+
+.form-file-input:focus {
+  border-color: #b8956a;
+  box-shadow: 0 0 0 3px rgba(184, 149, 106, 0.1);
+}
+
+.form-file-input:disabled {
+  background-color: #f5f2ee;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.file-input-help {
+  font-size: 11px;
+  margin-top: 8px;
+  color: #c4bbb0;
+}
+
+.file-selected-name {
+  font-size: 11px;
+  margin-top: 8px;
+  color: #2c2c2e;
+}
+
+/* Messages */
+.error-message {
+  margin-bottom: 24px;
+  padding: 16px;
+  border: 1px solid #e8dcd5;
+  background-color: #faf5f2;
+  border-radius: 8px;
+}
+
+.error-message-text {
+  font-size: 13px;
+  color: #c17767;
+}
+
+.success-message {
+  margin-bottom: 24px;
+  padding: 16px;
+  background-color: #2c2c2e;
+  color: #fff;
+  border-radius: 8px;
+}
+
+.success-message-text {
+  font-size: 13px;
+}
+
+/* Action Buttons */
+.form-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+  margin-top: 32px;
+}
+
+.btn-reset {
+  padding: 12px 24px;
+  border: 1px solid #e8e3dc;
+  font-size: 13px;
+  color: #2c2c2e;
+  border-radius: 8px;
+  background-color: #fff;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-reset:hover:not(:disabled) {
+  border-color: #b8956a;
+  background-color: #faf8f5;
+}
+
+.btn-reset:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-submit {
+  padding: 12px 24px;
+  font-size: 13px;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  background-color: #2c2c2e;
+}
+
+.btn-submit:hover:not(:disabled) {
+  background-color: #b8956a;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.btn-submit:disabled {
+  background-color: #c4bbb0;
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .guest-registration-wrapper {
+    padding: 24px;
+  }
+
+  .guest-registration-form {
+    padding: 24px;
+  }
+}
+
+@media (max-width: 768px) {
+  .guest-registration-wrapper {
+    padding: 16px;
+  }
+
+  .guest-registration-title {
+    font-size: 28px;
+  }
+
+  .guest-registration-form {
+    padding: 20px;
+  }
+
+  .form-grid-2-cols {
+    grid-template-columns: 1fr;
+    gap: 16px;
+    margin-bottom: 20px;
+  }
+
+  .form-field-full {
+    margin-bottom: 20px;
+  }
+
+  .form-actions {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .btn-reset,
+  .btn-submit {
+    width: 100%;
+  }
+}

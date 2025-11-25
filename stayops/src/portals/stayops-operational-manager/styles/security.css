@@ -1,0 +1,248 @@
+/* ==========================================
+   StayOps Security Component Styles
+   ========================================== */
+
+/* Container */
+.security-container {
+  min-height: 100vh;
+  background-color: #faf8f5;
+}
+
+.security-wrapper {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 32px;
+}
+
+/* Header */
+.security-header {
+  margin-bottom: 32px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #e8e3dc;
+}
+
+.security-title {
+  font-size: 36px;
+  font-weight: 300;
+  color: #2c2c2e;
+  letter-spacing: -0.5px;
+  margin-bottom: 4px;
+}
+
+.security-subtitle {
+  font-size: 11px;
+  color: #8b8680;
+}
+
+/* Stats Cards */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin-bottom: 32px;
+}
+
+.stat-card {
+  border: 1px solid #e8e3dc;
+  padding: 24px;
+  border-radius: 8px;
+  background-color: #fff;
+  transition: all 0.2s ease;
+}
+
+.stat-card:hover {
+  border-color: #b8956a;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.stat-label {
+  font-size: 11px;
+  color: #8b8680;
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-weight: 500;
+}
+
+.stat-value {
+  font-size: 28px;
+  font-weight: 300;
+  color: #2c2c2e;
+  letter-spacing: -0.5px;
+}
+
+/* Security Logs Section */
+.logs-section {
+  border: 1px solid #e8e3dc;
+  border-radius: 8px;
+  background-color: #fff;
+}
+
+.logs-header {
+  padding: 24px;
+  border-bottom: 1px solid #e8e3dc;
+}
+
+.logs-title {
+  font-size: 24px;
+  font-weight: 300;
+  color: #2c2c2e;
+  letter-spacing: -0.5px;
+}
+
+.logs-content {
+  padding: 24px;
+}
+
+/* Empty State */
+.empty-state {
+  padding: 96px 0;
+  text-align: center;
+}
+
+.empty-state-text {
+  font-size: 13px;
+  color: #c4bbb0;
+}
+
+/* Logs List */
+.logs-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Log Card */
+.log-card {
+  border: 1px solid #e8e3dc;
+  border-radius: 8px;
+  background-color: #fff;
+  transition: all 0.2s ease;
+}
+
+.log-card:hover {
+  border-color: #b8956a;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.log-card-content {
+  padding: 20px;
+}
+
+.log-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+}
+
+.log-card-info {
+  flex: 1;
+}
+
+.log-action {
+  font-size: 18px;
+  font-weight: 300;
+  color: #2c2c2e;
+  letter-spacing: -0.5px;
+  margin-bottom: 8px;
+}
+
+.log-details {
+  font-size: 13px;
+  color: #8b8680;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.log-timestamp {
+  font-size: 11px;
+  color: #c4bbb0;
+  margin-top: 4px;
+}
+
+/* Status Badge */
+.status-badge {
+  padding: 6px 12px;
+  font-size: 11px;
+  border-radius: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.status-badge.success {
+  background-color: #2c2c2e;
+  color: #fff;
+}
+
+.status-badge.blocked {
+  background-color: #c17767;
+  color: #fff;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .security-wrapper {
+    padding: 16px;
+  }
+
+  .security-header {
+    margin-bottom: 24px;
+  }
+
+  .security-title {
+    font-size: 28px;
+  }
+
+  .stats-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+
+  .stat-value {
+    font-size: 24px;
+  }
+
+  .logs-section {
+    border-radius: 8px;
+  }
+
+  .logs-header {
+    padding: 20px;
+  }
+
+  .logs-title {
+    font-size: 20px;
+  }
+
+  .logs-content {
+    padding: 16px;
+  }
+
+  .log-card-content {
+    padding: 16px;
+  }
+
+  .log-card-header {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .log-action {
+    font-size: 16px;
+  }
+
+  .status-badge {
+    align-self: flex-start;
+  }
+}

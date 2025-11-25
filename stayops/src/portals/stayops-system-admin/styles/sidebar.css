@@ -1,0 +1,300 @@
+/* ==========================================
+   StayOps Admin Sidebar Component Styles
+   ========================================== */
+
+/* Sidebar Container */
+.sidebar {
+  width: 280px;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background-color: #ffffff;
+  border-right: 1px solid #e5e7eb;
+  position: sticky;
+  top: 0;
+  flex-shrink: 0;
+}
+
+/* Header/Logo Section */
+.sidebar-header {
+  padding: 24px;
+  border-bottom: 1px solid #e5e7eb;
+  background-color: #ffffff;
+  flex-shrink: 0;
+}
+
+.sidebar-logo {
+  font-size: 24px;
+  font-weight: 400;
+  letter-spacing: -0.5px;
+  color: #111827;
+  margin: 0;
+  line-height: 1.2;
+}
+
+.sidebar-subtitle {
+  font-size: 12px;
+  color: #6b7280;
+  margin: 4px 0 0 0;
+  font-weight: 400;
+  line-height: 1.3;
+}
+
+/* Navigation Section */
+.sidebar-nav {
+  flex: 1;
+  padding: 12px 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  user-select: none;
+  background-color: #ffffff;
+}
+
+.nav-list {
+  list-style: none;
+  margin: 0;
+  padding: 0 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.nav-item {
+  margin: 0;
+  padding: 0;
+}
+
+/* Navigation Links */
+.nav-link,
+.nav-button {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 16px;
+  font-size: 14px;
+  text-decoration: none;
+  background-color: transparent;
+  color: #374151;
+  border-radius: 8px;
+  font-weight: 400;
+  transition: all 0.15s ease;
+  outline: none;
+  border: none;
+  cursor: pointer;
+  width: 100%;
+  text-align: left;
+  line-height: 1.5;
+}
+
+.nav-link:hover,
+.nav-link.hovered,
+.nav-button:hover,
+.nav-button.hovered {
+  background-color: #f3f4f6;
+  color: #111827;
+}
+
+.nav-link.active {
+  background-color: #b8956a;
+  color: #ffffff;
+  font-weight: 500;
+}
+
+.nav-button.active {
+  background-color: #f9fafb;
+  color: #111827;
+  font-weight: 500;
+}
+
+.nav-link:focus,
+.nav-button:focus {
+  outline: none;
+  box-shadow: none;
+}
+
+.nav-link:active,
+.nav-link:visited {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* Navigation Button (for expandable items) */
+.nav-button {
+  justify-content: space-between;
+}
+
+.nav-button-content {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+  min-width: 0;
+}
+
+.nav-button-content span {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Navigation Divider */
+.nav-divider-wrapper {
+  margin: 12px 0;
+}
+
+.nav-divider {
+  height: 1px;
+  background-color: #e5e7eb;
+  margin: 0;
+}
+
+/* Sub-navigation (nested items) */
+.sub-nav-list {
+  list-style: none;
+  margin: 4px 0 8px 0;
+  padding: 0 0 0 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.sub-nav-item {
+  margin: 0;
+  padding: 0;
+}
+
+.sub-nav-link {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 16px;
+  font-size: 13px;
+  text-decoration: none;
+  background-color: transparent;
+  color: #6b7280;
+  border-radius: 6px;
+  font-weight: 400;
+  transition: all 0.15s ease;
+  outline: none;
+  border: none;
+  line-height: 1.5;
+}
+
+.sub-nav-link:hover,
+.sub-nav-link.hovered {
+  background-color: #f3f4f6;
+  color: #111827;
+}
+
+.sub-nav-link.active {
+  background-color: #e5e7eb;
+  color: #111827;
+  font-weight: 500;
+}
+
+.sub-nav-link:focus {
+  outline: none;
+  box-shadow: none;
+}
+
+.sub-nav-link:active,
+.sub-nav-link:visited {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* Sidebar Footer (Logout) */
+.sidebar-footer {
+  padding: 16px;
+  border-top: 1px solid #e5e7eb;
+  flex-shrink: 0;
+  background-color: #ffffff;
+}
+
+.logout-button {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 16px;
+  font-size: 14px;
+  background-color: transparent;
+  color: #6b7280;
+  border: none;
+  border-radius: 8px;
+  font-weight: 400;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  outline: none;
+  text-align: left;
+  line-height: 1.5;
+}
+
+.logout-button:hover,
+.logout-button.hovered {
+  background-color: #fef2f2;
+  color: #dc2626;
+}
+
+.logout-button:focus {
+  outline: none;
+  box-shadow: none;
+}
+
+/* Custom Scrollbar */
+.sidebar-nav::-webkit-scrollbar {
+  width: 6px;
+}
+
+.sidebar-nav::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.sidebar-nav::-webkit-scrollbar-thumb {
+  background: #d1d5db;
+  border-radius: 3px;
+}
+
+.sidebar-nav::-webkit-scrollbar-thumb:hover {
+  background: #9ca3af;
+}
+
+/* Remove default link underline */
+.nav-link,
+.sub-nav-link {
+  text-decoration: none !important;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .sidebar {
+    width: 100%;
+    height: auto;
+    min-height: 100vh;
+  }
+
+  .sidebar-header {
+    padding: 20px;
+  }
+
+  .sidebar-logo {
+    font-size: 22px;
+  }
+
+  .sidebar-nav {
+    padding: 10px 0;
+  }
+
+  .nav-list {
+    padding: 0 12px;
+  }
+
+  .nav-link,
+  .nav-button {
+    padding: 10px 14px;
+  }
+
+  .sub-nav-link {
+    padding: 8px 14px;
+  }
+}

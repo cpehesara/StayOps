@@ -1,0 +1,8 @@
+/* src/index.css - Global Reset and Base Styles */
+
+/* Tailwind CSS directives */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* CSS Reset */
